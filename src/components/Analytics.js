@@ -5,9 +5,9 @@ import Detailed from './Detailed';
 import Recommendations from './Recommendations';
 
 
-function Analytics() {
+function Analytics({refProp}) {
   return (
-    <Stack 
+    <Stack ref={refProp}
     direction="column"
     spacing={2}>
         <Overview/>
