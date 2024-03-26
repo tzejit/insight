@@ -21,3 +21,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# python backend
+*.pyc
+**/__pycache__
+/backend/instance
+*.csv
