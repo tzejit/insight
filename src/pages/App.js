@@ -7,7 +7,9 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Typography } from '@mui/material';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 const theme = createTheme({ 
     palette: {  primary: {main: '#f2f2f2' },
@@ -24,6 +26,9 @@ const theme = createTheme({
 
 function App() {
     const pdfRef = useRef(null)
+    const [token, setToken] = useState('')
+    const navigate = useNavigate();
+
     const handleDownloadPDF = () => {
         html2canvas(pdfRef.current).then((canvas) => {
             const imgData = canvas.toDataURL('image/png');
@@ -40,13 +45,48 @@ function App() {
         });
     };
 
+    // To update once dashboard endpoint is out
+    useEffect(() => {
+        async function fetchData() {
+            const token = localStorage.getItem('jwt-token')
+            setToken(token)
+            let res = await fetch('http://127.0.0.1:5000/auth_api', {
+            mode:'cors',
+            headers: {
+                'jwt-token': token,
+            },
+            })
+            res = await res.json() 
+        }
+
+        fetchData()
+
+      }, [])
+
+    const logout = () => {
+        setToken('')
+        localStorage.removeItem('jwt-token')
+        navigate('/')
+
+    }
+    
+    if (!token) {
+        return (
+            <ThemeProvider theme={theme}>
+            <Box>
+                <Typography color='grey.main' variant='h5' fontWeight='fontWeightMedium' margin='1em'>You are not logged in</Typography>
+            </Box>
+        </ThemeProvider>
+        )
+    }
+
   return (
     <ThemeProvider theme={theme}>
         <Box>
             <Typography color='grey.main' variant='h5' fontWeight='fontWeightMedium' margin='1em'>Welcome to InSight!</Typography>
             <Grid container spacing={2}>
                 <Grid item xs={2} sx={{position: 'sticky', top: 0, alignSelf: 'start', marginLeft:'1vw'}}>
-                    <Menu downloadFunc={handleDownloadPDF}/>
+                    <Menu downloadFunc={handleDownloadPDF} logoutFunc={logout}/>
                 </Grid>
                 <Grid item xs='auto'>
                     <Divider orientation="vertical"/>

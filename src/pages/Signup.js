@@ -2,6 +2,10 @@ import TextField from '@mui/material/TextField';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Button, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import Alert from '@mui/material/Alert';
+
 
 const theme = createTheme({ 
     palette: {  primary: {main: '#f2f2f2' },
@@ -17,16 +21,41 @@ const theme = createTheme({
 })
 
 function Signup() {
+    const navigate = useNavigate();
+
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const [error, setError] = useState('')
+
+    async function signupApiCall() {
+        let res = await fetch('http://127.0.0.1:5000/signup', {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+          })
+        res = await res.json()
+        if (res.message === 'success') {
+            localStorage.setItem('jwt-token', res.token)
+            setUsername('')
+            setPassword('')
+            navigate('/dashboard')
+          } else {
+            setError(res.message)
+          }
+      }
   return (
     <ThemeProvider theme={theme}>
             <Stack justifyContent="center" alignItems="center">
 
                 <Typography color='black' variant='h5' fontWeight='fontWeightMedium' margin='1em'>InSight</Typography>
                 <TextField label="Email" variant="outlined" />
-                <TextField label="Username" variant="outlined" />
-                <TextField label="Password" variant="outlined" />
-                <Button variant="contained"> Signup </Button>
-                
+                <TextField label="Username" variant="outlined" onChange={(e)=>setUsername(e.target.value)}/>
+                <TextField label="Password" variant="outlined" onChange={(e)=>setPassword(e.target.value)}/>
+                <Button variant="contained" onClick={signupApiCall}> Signup </Button>
+                {error ? <Alert severity="error">{error}</Alert>: ''}
             </Stack>
     </ThemeProvider>
 

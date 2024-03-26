@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack';
 import { useRef, useState } from 'react';
 
 
-function Menu({downloadFunc}) {
+function Menu({downloadFunc, logoutFunc}) {
 
     const inputRef = useRef(null)
     const [fileName, setFileName] = useState("")
@@ -19,7 +19,7 @@ function Menu({downloadFunc}) {
         <hr/>
         <Button key="connect" variant="contained" disableElevation><b>Connect to Amazon seller account</b></Button>
         <hr/>
-        <Button key="logout" variant="contained" disableElevation><b>Logout</b></Button>
+        <Button key="logout" variant="contained" disableElevation onClick={logoutFunc}><b>Logout</b></Button>
 
     </Stack>
   );
