@@ -1,7 +1,7 @@
 import os
 import logging
 import dotenv
-from flask import Flask, json, request_finished
+from flask import Flask, json, request
 from aws_interface import AWS
 from datetime import datetime, timedelta, timezone
 import jwt
