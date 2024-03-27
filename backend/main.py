@@ -2,6 +2,7 @@ import os
 import logging
 import dotenv
 from flask import Flask, json, request
+from aws_interface import AWS
 
 
 logger = logging.getLogger(__name__)
@@ -10,7 +11,7 @@ dotenv.load_dotenv()
 
 # create and configure the app
 app = Flask(__name__, instance_relative_config=True)
-# app.config.from_pyfile("config.py", silent=True)
+aws = AWS(test_env=True)
 
 try:
     os.makedirs(app.instance_path)
@@ -38,22 +39,22 @@ def create_error(message):
 
 @app.route("/get_file_listing/<user_id>", methods=["GET"])
 def get_file_listing(user_id):
-    if user_id not in file_dict:
+    if user_id not in aws.s3.listBuckets():
         return create_error(f"User {user_id} does not exist")
-    list_of_files = list(file_dict[user_id].keys())
+    list_of_files = aws.s3.listObjects(user_id)
     return create_response(user_id=user_id, files=list_of_files)
 
 
 @app.route("/get_file/<user_id>/<file_id>", methods=["GET"])
 def get_file(user_id, file_id):
-    if user_id not in file_dict:
+    if user_id not in aws.s3.listBuckets():
         return create_error(f"User {user_id} does not exist")
-    if file_id not in file_dict[user_id]:
+    if file_id not in aws.s3.listObjects(user_id):
         return create_error(f"File {file_id} does not exist for user {user_id}")
     return create_response(
         user_id=user_id,
         file_id=file_id,
-        link=file_dict[user_id][file_id],
+        link=f"{user_id}/{file_id}.csv",
     )
 
 
@@ -62,14 +63,10 @@ def upload_file(user_id, file_id):
     if "uploadFile" not in request.files:
         return create_error("No file uploaded")
 
+    # TODO: asynchronously run ReviewProcessor.process_data
+
     file = request.files["uploadFile"]
-    link = (
-        f"link://{file.filename}"  # placeholder link, TODO: update after S3 integration
-    )
-    if user_id not in file_dict:
-        file_dict[user_id] = {file_id: link}
-    else:
-        file_dict[user_id][file_id] = link
+    aws.s3.upload(user_id, file, file_id)
     return create_response()
 
 
