@@ -2,6 +2,7 @@ import boto3
 import os
 import io
 import dotenv
+import json
 import logging
 import pandas as pd
 
@@ -57,6 +58,12 @@ class AWS:
                 return "Object does not exist!"
             df = pd.read_csv(path)
             return df
+
+        def writeJsonObject(self, bucket_name, object_name, object_json):
+            object_name = object_name + "_processed.json"
+            path = os.path.join(self.temp_dir, bucket_name, object_name)
+            with open(path, 'w') as f:
+                f.write(json.dumps(object_json))
 
         def upload(self, bucket_name, file_to_upload, object_name):
             if not object_name.endswith(".csv"):

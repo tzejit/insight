@@ -1,15 +1,17 @@
 import os
 import logging
-import dotenv
+from dotenv import load_dotenv
 from flask import Flask, json, request
 from aws_interface import AWS
 from datetime import datetime, timedelta, timezone
 import jwt
 from passlib.hash import pbkdf2_sha256
 from flask_cors import CORS
+import asyncio
+from data_processing import ReviewProcessor
 
 logger = logging.getLogger(__name__)
-dotenv.load_dotenv()
+load_dotenv()
 
 
 # create and configure the app
@@ -17,6 +19,9 @@ app = Flask(__name__, instance_relative_config=True)
 aws = AWS(test_env=True)
 # app.config.from_pyfile("config.py", silent=True)
 CORS(app)
+
+# create a queue that we will use to store LLM processing tasks
+queue = asyncio.Queue()
 
 try:
     os.makedirs(app.instance_path)
@@ -100,13 +105,54 @@ def get_file(user_id, file_id):
         link=f"{user_id}/{file_id}.csv",
     )
 
+@app.route("/get_results/<user_id>/<file_id>", methods=["GET"])
+def get_results(user_id, file_id):
+    if user_id not in aws.s3.listBuckets():
+        return create_error(f"User {user_id} does not exist")
+    if file_id not in aws.s3.listObjects(user_id):
+        return create_error(f"File {file_id} does not exist for user {user_id}")
 
-@app.route("/upload_file/<user_id>/<file_id>", methods=["POST"])
+    return create_response(
+        user_id=user_id,
+        file_id=file_id,
+        link=f"{user_id}/{file_id}.csv",
+    )
+
+
+async def llm_worker(name, queue):
+    review_processor = ReviewProcessor(
+        "backend/prompt.txt",
+        "Amazon Kindle",
+        review_title_col="reviews.title",
+        review_text_col="reviews.text",
+        review_rating_col="reviews.rating",
+    )  # TODO: Put these constants in user config somehow
+    while True:
+        # Get a "work item" out of the queue.
+        (user_id, file_id) = await queue.get()
+
+        # Do the LLM shit
+        file_df = aws.s3.readObject(user_id, file_id)
+        output_df = review_processor.process_data(
+            file_df,
+        )
+        output_json = output_df.to_json(path_or_buf=None)  # return json as str
+        aws.s3.writeJsonObject(user_id, file_id, output_json)  # save file
+
+        # Notify the queue that the "work item" has been processed.
+        # queue.task_done()
+        # We don't actually need this?
+        # Maybe next time when we are multiprocessing each CSV
+
+        logger.info(f"Done processing file {user_id}/{file_id}")
+
+
+@app.route("/queue_file/<user_id>/<file_id>", methods=["POST"])
 def upload_file(user_id, file_id):
     if "uploadFile" not in request.files:
         return create_error("No file uploaded")
 
-    # TODO: asynchronously run ReviewProcessor.process_data
+    queue.put((user_id, file_id))  # send file to queue for processing
 
     file = request.files["uploadFile"]
     aws.s3.upload(user_id, file, file_id)
