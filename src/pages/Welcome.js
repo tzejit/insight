@@ -14,7 +14,7 @@ function Welcome() {
                 <Grid item xs={6} height='100%'>
                     <Stack justifyContent="center" alignItems="center" sx={{backgroundColor: 'yellow.main', borderRadius: '1em' }} height='100%'>
                         <Typography variant='h5' fontWeight='fontWeightMedium' marginBottom='1em'>Welcome to InSight!</Typography>
-                        <Avatar sx={{ width: '5em', height: '5em', marginBottom: '1em' }}/>
+                        <Avatar sx={{ width: '6em', height: '6em', marginBottom: '1em' }}/>
                         <Typography variant='h6' fontWeight='fontWeightMedium' >Eva Smith</Typography>
                         <Typography variant='body1' marginBottom='5em' fontWeight='fontWeightLight'>Subscription: Premium</Typography>
                         <YellowButton marginBottom='1em' width="20rem">View or edit profile</YellowButton>

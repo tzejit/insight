@@ -1,7 +1,7 @@
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import Menu from '../components/Menu';
+import Menu from '../components/AppMenu';
 import Analytics from '../components/Analytics';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Typography } from '@mui/material';
@@ -9,20 +9,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-
-const theme = createTheme({ 
-    palette: {  primary: {main: '#f2f2f2' },
-                yellow: {main: '#ffc000', transparent: '#ffc00033' }, 
-                grey: {main: '#252f3f'},
-                brown: {main: '#420D0D'}},
-    typography: {
-        button: {
-          textTransform: 'none',
-          flexDirection: "column"
-        }
-      }
-})
+import theme from '../components/themes/MainTheme';
 
 function App() {
     const pdfRef = useRef(null)

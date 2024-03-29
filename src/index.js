@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Welcome from './pages/Welcome';
+import History from './pages/History';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -20,6 +21,7 @@ root.render(
         <Route path="signup" element={<Signup />} />
         <Route path="dashboard" element={<App />} />
         <Route path="welcome" element={<Welcome />} />
+        <Route path="history" element={<History />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
