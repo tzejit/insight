@@ -1,17 +1,20 @@
-import TextField from '@mui/material/TextField';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Button, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import Alert from '@mui/material/Alert';
+import InsightTitle from '../components/typography/InsightTitle';
+import TextFieldYellow from '../components/inputs/TextFieldYellow';
+import BlackButton from '../components/buttons/BlackButton';
 
 
 const theme = createTheme({ 
     palette: {  primary: {main: '#f2f2f2' },
-                yellow: {main: '#ffc000', transparent: '#ffc00033' }, 
+                yellow: {main: '#FBD542', secondary: '#FDE89D' }, 
                 grey: {main: '#252f3f'},
-                brown: {main: '#420D0D'}},
+                brown: {main: '#420D0D'},
+                black: {main: '#06040A', contrastText: '#ffffff'}},
     typography: {
         button: {
           textTransform: 'none',
@@ -48,15 +51,25 @@ function Signup() {
       }
   return (
     <ThemeProvider theme={theme}>
-            <Stack justifyContent="center" alignItems="center">
-
-                <Typography color='black' variant='h5' fontWeight='fontWeightMedium' margin='1em'>InSight</Typography>
-                <TextField label="Email" variant="outlined" />
-                <TextField label="Username" variant="outlined" onChange={(e)=>setUsername(e.target.value)}/>
-                <TextField label="Password" variant="outlined" onChange={(e)=>setPassword(e.target.value)}/>
-                <Button variant="contained" onClick={signupApiCall}> Signup </Button>
+        <Box sx={{backgroundColor: 'yellow.main', flexDirection: 'column' }} height='100vh' width='100vw' display="flex" justifyContent="space-evenly" alignItems="center">
+            <InsightTitle/>
+            <Stack justifyContent="center" alignItems="center" spacing={2}>
+                <Box width="100%"> 
+                    <Typography color='black' variant='body1' fontWeight='fontWeightMedium' align="left">Email</Typography>
+                </Box>
+                <TextFieldYellow/>
+                <Box width="100%"> 
+                    <Typography color='black' variant='body1' fontWeight='fontWeightMedium' align="left">Username</Typography>
+                </Box>
+                <TextFieldYellow onChange={(e)=>setUsername(e.target.value)}/>
+                <Box width="100%"> 
+                    <Typography color='black' variant='body1' fontWeight='fontWeightMedium' align="left">Password</Typography>
+                </Box>
+                <TextFieldYellow  onChange={(e)=>setPassword(e.target.value)}/>
                 {error ? <Alert severity="error">{error}</Alert>: ''}
             </Stack>
+            <BlackButton onClick={signupApiCall}>Signup</BlackButton>
+        </Box>
     </ThemeProvider>
 
   );

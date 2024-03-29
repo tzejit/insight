@@ -1,0 +1,26 @@
+.rectangle {
+    display: inline-block;
+    width: 20em;
+    height: 7em;
+    background: #FBD542;
+    border-style: solid;
+    border-radius: 5em;
+    border-width: 1px;
+    text-align: center;
+    align-content: center;
+    z-index: 2;
+}
+
+.rectangle2 {
+    display: inline-block;
+    width: 20em;
+    height: 7em;
+    background: transparent;
+    border-style: solid;
+    border-radius: 5em;
+    border-width: 1px;
+    text-align: center;
+    margin-top: -6.5em;
+    margin-right: -1em;
+    z-index: 1;
+}
