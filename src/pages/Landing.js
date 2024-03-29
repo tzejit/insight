@@ -1,25 +1,13 @@
 import Grid from '@mui/material/Grid';
 import { Link } from "react-router-dom";
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { Typography, Box } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import './landing.css'
 import InsightTitle from '../components/typography/InsightTitle';
 import BlackButton from '../components/buttons/BlackButton';
+import theme from '../components/themes/MainTheme';
 
-const theme = createTheme({ 
-    palette: {  primary: {main: '#f2f2f2' },
-                yellow: {main: '#FBD542', transparent: '#ffc00033' }, 
-                grey: {main: '#252f3f'},
-                brown: {main: '#420D0D'},
-                black: {main: '#06040A'}},
-    typography: {
-        button: {
-          textTransform: 'none',
-          flexDirection: "column",
-        }
-      },
-})
 
 function Landing() {
   return (

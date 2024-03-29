@@ -1,4 +1,4 @@
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
@@ -8,20 +8,8 @@ import Alert from '@mui/material/Alert';
 import InsightTitle from '../components/typography/InsightTitle';
 import BlackButton from '../components/buttons/BlackButton';
 import TextFieldYellow from '../components/inputs/TextFieldYellow';
+import theme from '../components/themes/MainTheme';
 
-const theme = createTheme({ 
-    palette: {  primary: {main: '#f2f2f2' },
-                yellow: {main: '#FBD542', secondary: '#FDE89D' }, 
-                grey: {main: '#252f3f'},
-                brown: {main: '#420D0D'},
-                black: {main: '#06040A', contrastText: '#ffffff'}},
-    typography: {
-        button: {
-          textTransform: 'none',
-          flexDirection: "column"
-        }
-      },
-})
 
 function Login() {
   const navigate = useNavigate();

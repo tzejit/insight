@@ -59,7 +59,8 @@ function App() {
             res = await res.json() 
         }
 
-        fetchData()
+        // fetchData()
+        setToken("a")
 
       }, [])
 
