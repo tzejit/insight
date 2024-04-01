@@ -1,29 +1,32 @@
 import os
-import logging
-import dotenv
-from flask import Flask, json, request
-from aws_interface import AWS
-from datetime import datetime, timedelta, timezone
+import threading
 import jwt
+from asyncio import Queue
+from dotenv import load_dotenv
+from flask import Flask, json, request
+from datetime import datetime, timedelta, timezone
 from passlib.hash import pbkdf2_sha256
 from flask_cors import CORS
 
-logger = logging.getLogger(__name__)
-dotenv.load_dotenv()
+from aws_interface import AWS
+from data_processing import llm_worker
 
+load_dotenv()
 
-# create and configure the app
+# Create and configure the app
 app = Flask(__name__, instance_relative_config=True)
 aws = AWS(test_env=True)
 # app.config.from_pyfile("config.py", silent=True)
 CORS(app)
+
+# Instantiate queue for processing work
+llm_queue = Queue()
 
 try:
     os.makedirs(app.instance_path)
 except OSError:
     pass
 
-file_dict = {}
 jwtSecretKey = "put in env var later"
 
 
@@ -101,15 +104,45 @@ def get_file(user_id, file_id):
     )
 
 
-@app.route("/upload_file/<user_id>/<file_id>", methods=["POST"])
-def upload_file(user_id, file_id):
+@app.route("/get_results/<user_id>/<file_id>", methods=["GET"])
+def get_results(user_id, file_id):
+    if user_id not in aws.s3.listBuckets():
+        return create_error(f"User {user_id} does not exist")
+    bucket_objects = aws.s3.listObjects(user_id)
+    if file_id not in bucket_objects:
+        return create_error(f"File {file_id} does not exist for user {user_id}")
+
+    # TODO: Come up with a better way to figure out if failed or in progress
+    if (file_id + "_processed") not in bucket_objects:
+        return create_response(
+            user_id=user_id,
+            file_id=file_id,
+            status="processing",
+            message="",
+            results="",
+        )
+
+    # If succeeded or failed, full JSON response body will be generated
+    results = aws.s3.readJsonObject(user_id, file_id)
+    return create_response(**results)
+
+
+@app.route("/queue_file/<user_id>/<file_id>", methods=["POST"])
+async def queue_file(user_id, file_id):
     if "uploadFile" not in request.files:
         return create_error("No file uploaded")
 
-    # TODO: asynchronously run ReviewProcessor.process_data
-
     file = request.files["uploadFile"]
     aws.s3.upload(user_id, file, file_id)
+
+    # work on file in a separate thread
+    # TODO: set up a pool of workers and a queue for incoming processing requests
+    # also need to figure out how to rate limit requests per minute
+    worker_thread = threading.Thread(
+        target=llm_worker, args=(user_id, file_id, aws, app.logger)
+    )
+    worker_thread.start()
+
     return create_response()
 
 
@@ -150,6 +183,11 @@ def login():
     encoded_jwt = jwt.encode(data, jwtSecretKey, algorithm="HS256")
     return create_response(message="success", token=encoded_jwt)
 
+
+if __name__ == "__main__":
+    # This part only runs if we are debugging, since we will run this
+    # code indirectly through uwsgi or whatever in production
+    app.run(debug=True, use_reloader=False)
 
 ## TODO:
 # 1. POST user data

@@ -1,7 +1,7 @@
 import google.generativeai as genai
-import logger
+import logging
 
-logger = logger.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class Gemini:
@@ -27,7 +27,7 @@ class Gemini:
         logger.info(f"Using prompt template: {prompt_template[:50]}...")
 
         # we require {{INPUT_DATA}} in prompt template
-        if "{{INPUT_DATA}}" not in self.prompt_template:
+        if "{{INPUT_DATA}}" not in prompt_template:
             raise KeyError("{{INPUT_DATA}} field is required in prompt template")
         self.prompt_template = prompt_template
 

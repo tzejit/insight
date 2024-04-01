@@ -2,6 +2,7 @@ import boto3
 import os
 import io
 import dotenv
+import json
 import logging
 import pandas as pd
 
@@ -41,15 +42,17 @@ class AWS:
                 return "No buckets at this time"
             return buckets
 
-        def listObjects(self, bucket_name):
+        def listObjects(self, bucket_name) -> list[str]:
             path = os.path.join(self.temp_dir, bucket_name)
             if not os.path.exists(path):
                 return "Bucket does not exist!"
             object_list = os.listdir(path)
-            object_list = [o.replace(".csv", "") for o in object_list]  # hide .csv
+            object_list = [
+                o.replace(".csv", "").replace(".json", "") for o in object_list
+            ]  # hide .csv and .json
             return object_list
 
-        def readObject(self, bucket_name, object_name):
+        def readObject(self, bucket_name, object_name) -> pd.DataFrame:
             if not object_name.endswith(".csv"):
                 object_name = object_name + ".csv"
             path = os.path.join(self.temp_dir, bucket_name, object_name)
@@ -57,6 +60,21 @@ class AWS:
                 return "Object does not exist!"
             df = pd.read_csv(path)
             return df
+
+        # TODO: Deprecate this in favor of using DocumentDB
+        def readJsonObject(self, bucket_name, object_name) -> dict:
+            object_name = object_name + "_processed.json"
+            path = os.path.join(self.temp_dir, bucket_name, object_name)
+            with open(path, "r") as f:
+                json_data = json.loads(f.read())
+            return json_data
+
+        # TODO: Deprecate this in favor of using DocumentDB
+        def writeJsonObject(self, bucket_name, object_name, object_json):
+            object_name = object_name + "_processed.json"
+            path = os.path.join(self.temp_dir, bucket_name, object_name)
+            with open(path, "w") as f:
+                f.write(json.dumps(object_json))
 
         def upload(self, bucket_name, file_to_upload, object_name):
             if not object_name.endswith(".csv"):
