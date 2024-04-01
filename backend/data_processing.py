@@ -19,7 +19,7 @@ class ReviewProcessor:
 
     def process_data(
         self, df, review_title_col="", review_text_col="", review_rating_col=""
-    ):
+    ) -> pd.DataFrame:
         columns = [
             (review_title_col, "review_title"),
             (review_text_col, "review"),
@@ -54,10 +54,9 @@ class ReviewProcessor:
                 summary_df = pd.DataFrame.from_records(summary)
 
         output_df = pd.DataFrame()
-        output_df['frequency'] = summary_df.groupby("topic")['frequency'].sum()
-        output_df['sentiment'] = summary_df.groupby("topic")['sentiment'].mean()
+        output_df["frequency"] = summary_df.groupby("topic")["frequency"].sum()
+        output_df["sentiment"] = summary_df.groupby("topic")["sentiment"].mean()
         return output_df
-
 
 
 def llm_worker(user_id, file_id, aws, logger):
@@ -65,21 +64,37 @@ def llm_worker(user_id, file_id, aws, logger):
         "backend/prompt.txt",
         "Amazon Kindle",
     )  # TODO: Put these constants in user config, retrieve by user_id?
-        
+
     # Process review data with LLM
     logger.info(f"Working on {user_id}, {file_id}")
     file_df = aws.s3.readObject(user_id, file_id)
     logger.info("Read file")
-    output_df = review_processor.process_data(
-        file_df,
-        review_title_col="reviews.title",
-        review_text_col="reviews.text",
-        review_rating_col="reviews.rating",
-    )  # TODO: Put these constants in user config somehow
-    logger.info(f"Processed file, length of output is: {len(output_df)}")
+    try:
+        output_df = review_processor.process_data(
+            file_df,
+            review_title_col="reviews.title",
+            review_text_col="reviews.text",
+            review_rating_col="reviews.rating",
+        )  # TODO: Put these constants in user config somehow
+        logger.info(f"Processed file, length of output is: {len(output_df)}")
+        output_json = output_df.to_json(path_or_buf=None)  # return json as str
+        wrapper_json = {
+            "user_id": user_id,
+            "file_id": file_id,
+            "status": "success",
+            "message": "",
+            "results": output_json,
+        }
+    except Exception as e:
+        wrapper_json = {
+            "user_id": user_id,
+            "file_id": file_id,
+            "status": "failed",
+            "message": str(e),
+            "results": "",
+        }
 
-    output_json = output_df.to_json(path_or_buf=None)  # return json as str
-    aws.s3.writeJsonObject(user_id, file_id, output_json)  # save file
+    aws.s3.writeJsonObject(user_id, file_id, wrapper_json)  # save file
 
     # Notify the queue that the "work item" has been processed.
     # queue.task_done()

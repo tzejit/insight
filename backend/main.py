@@ -108,16 +108,23 @@ def get_file(user_id, file_id):
 def get_results(user_id, file_id):
     if user_id not in aws.s3.listBuckets():
         return create_error(f"User {user_id} does not exist")
-    if file_id not in aws.s3.listObjects(user_id):
+    bucket_objects = aws.s3.listObjects(user_id)
+    if file_id not in bucket_objects:
         return create_error(f"File {file_id} does not exist for user {user_id}")
 
-    results = aws.s3.readJsonObject(user_id, file_id)
+    # TODO: Come up with a better way to figure out if failed or in progress
+    if (file_id + "_processed") not in bucket_objects:
+        return create_response(
+            user_id=user_id,
+            file_id=file_id,
+            status="processing",
+            message="",
+            results="",
+        )
 
-    return create_response(
-        user_id=user_id,
-        file_id=file_id,
-        results=results,
-    )
+    # If succeeded or failed, full JSON response body will be generated
+    results = aws.s3.readJsonObject(user_id, file_id)
+    return create_response(**results)
 
 
 @app.route("/queue_file/<user_id>/<file_id>", methods=["POST"])
