@@ -1,9 +1,10 @@
 import os
 import threading
+import jwt
+from asyncio import Queue
 from dotenv import load_dotenv
 from flask import Flask, json, request
 from datetime import datetime, timedelta, timezone
-import jwt
 from passlib.hash import pbkdf2_sha256
 from flask_cors import CORS
 
@@ -12,11 +13,14 @@ from data_processing import llm_worker
 
 load_dotenv()
 
-# create and configure the app
+# Create and configure the app
 app = Flask(__name__, instance_relative_config=True)
 aws = AWS(test_env=True)
 # app.config.from_pyfile("config.py", silent=True)
 CORS(app)
+
+# Instantiate queue for processing work
+llm_queue = Queue()
 
 try:
     os.makedirs(app.instance_path)
@@ -106,7 +110,9 @@ def get_results(user_id, file_id):
         return create_error(f"User {user_id} does not exist")
     if file_id not in aws.s3.listObjects(user_id):
         return create_error(f"File {file_id} does not exist for user {user_id}")
+
     results = aws.s3.readJsonObject(user_id, file_id)
+
     return create_response(
         user_id=user_id,
         file_id=file_id,
@@ -115,7 +121,7 @@ def get_results(user_id, file_id):
 
 
 @app.route("/queue_file/<user_id>/<file_id>", methods=["POST"])
-async def upload_file(user_id, file_id):
+async def queue_file(user_id, file_id):
     if "uploadFile" not in request.files:
         return create_error("No file uploaded")
 
@@ -130,13 +136,7 @@ async def upload_file(user_id, file_id):
     )
     worker_thread.start()
 
-    return create_response(thread_name=str(worker_thread.name), started=True)
-
-
-@app.route("/get_queue_size", methods=["GET"])
-async def get_queue_size():
-    curr_queue_size = threading.active_count()
-    return create_response(queue_size=curr_queue_size)
+    return create_response()
 
 
 @app.route("/signup", methods=["POST"])
@@ -178,7 +178,9 @@ def login():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, use_reloader=False)  # TODO: Put debug in env
+    # This part only runs if we are debugging, since we will run this
+    # code indirectly through uwsgi or whatever in production
+    app.run(debug=True, use_reloader=False)
 
 ## TODO:
 # 1. POST user data
