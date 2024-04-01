@@ -59,6 +59,15 @@ class AWS:
             df = pd.read_csv(path)
             return df
 
+        # TODO: Deprecate this in favor of using DocumentDB
+        def readJsonObject(self, bucket_name, object_name):
+            object_name = object_name + "_processed.json"
+            path = os.path.join(self.temp_dir, bucket_name, object_name)
+            with open(path, 'r') as f:
+                json_data = json.loads(f.read())
+            return json_data
+
+        # TODO: Deprecate this in favor of using DocumentDB
         def writeJsonObject(self, bucket_name, object_name, object_json):
             object_name = object_name + "_processed.json"
             path = os.path.join(self.temp_dir, bucket_name, object_name)

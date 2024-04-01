@@ -1,18 +1,16 @@
 import os
-import logging
+import threading
 from dotenv import load_dotenv
 from flask import Flask, json, request
-from aws_interface import AWS
 from datetime import datetime, timedelta, timezone
 import jwt
 from passlib.hash import pbkdf2_sha256
 from flask_cors import CORS
-import asyncio
-from data_processing import ReviewProcessor
 
-logger = logging.getLogger(__name__)
+from aws_interface import AWS
+from data_processing import llm_worker
+
 load_dotenv()
-
 
 # create and configure the app
 app = Flask(__name__, instance_relative_config=True)
@@ -20,15 +18,11 @@ aws = AWS(test_env=True)
 # app.config.from_pyfile("config.py", silent=True)
 CORS(app)
 
-# create a queue that we will use to store LLM processing tasks
-queue = asyncio.Queue()
-
 try:
     os.makedirs(app.instance_path)
 except OSError:
     pass
 
-file_dict = {}
 jwtSecretKey = "put in env var later"
 
 
@@ -105,58 +99,44 @@ def get_file(user_id, file_id):
         link=f"{user_id}/{file_id}.csv",
     )
 
+
 @app.route("/get_results/<user_id>/<file_id>", methods=["GET"])
 def get_results(user_id, file_id):
     if user_id not in aws.s3.listBuckets():
         return create_error(f"User {user_id} does not exist")
     if file_id not in aws.s3.listObjects(user_id):
         return create_error(f"File {file_id} does not exist for user {user_id}")
-
+    results = aws.s3.readJsonObject(user_id, file_id)
     return create_response(
         user_id=user_id,
         file_id=file_id,
-        link=f"{user_id}/{file_id}.csv",
+        results=results,
     )
 
 
-async def llm_worker(name, queue):
-    review_processor = ReviewProcessor(
-        "backend/prompt.txt",
-        "Amazon Kindle",
-        review_title_col="reviews.title",
-        review_text_col="reviews.text",
-        review_rating_col="reviews.rating",
-    )  # TODO: Put these constants in user config somehow
-    while True:
-        # Get a "work item" out of the queue.
-        (user_id, file_id) = await queue.get()
-
-        # Do the LLM shit
-        file_df = aws.s3.readObject(user_id, file_id)
-        output_df = review_processor.process_data(
-            file_df,
-        )
-        output_json = output_df.to_json(path_or_buf=None)  # return json as str
-        aws.s3.writeJsonObject(user_id, file_id, output_json)  # save file
-
-        # Notify the queue that the "work item" has been processed.
-        # queue.task_done()
-        # We don't actually need this?
-        # Maybe next time when we are multiprocessing each CSV
-
-        logger.info(f"Done processing file {user_id}/{file_id}")
-
-
 @app.route("/queue_file/<user_id>/<file_id>", methods=["POST"])
-def upload_file(user_id, file_id):
+async def upload_file(user_id, file_id):
     if "uploadFile" not in request.files:
         return create_error("No file uploaded")
 
-    queue.put((user_id, file_id))  # send file to queue for processing
-
     file = request.files["uploadFile"]
     aws.s3.upload(user_id, file, file_id)
-    return create_response()
+
+    # work on file in a separate thread
+    # TODO: set up a pool of workers and a queue for incoming processing requests
+    # also need to figure out how to rate limit requests per minute
+    worker_thread = threading.Thread(
+        target=llm_worker, args=(user_id, file_id, aws, app.logger)
+    )
+    worker_thread.start()
+
+    return create_response(thread_name=str(worker_thread.name), started=True)
+
+
+@app.route("/get_queue_size", methods=["GET"])
+async def get_queue_size():
+    curr_queue_size = threading.active_count()
+    return create_response(queue_size=curr_queue_size)
 
 
 @app.route("/signup", methods=["POST"])
@@ -196,6 +176,9 @@ def login():
     encoded_jwt = jwt.encode(data, jwtSecretKey, algorithm="HS256")
     return create_response(message="success", token=encoded_jwt)
 
+
+if __name__ == "__main__":
+    app.run(debug=True, use_reloader=False)  # TODO: Put debug in env
 
 ## TODO:
 # 1. POST user data
