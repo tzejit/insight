@@ -18,7 +18,7 @@ class ReviewProcessor:
         self.model = gemini
 
     def process_data(
-        self, df, review_title_col="", review_text_col="", review_rating_col=""
+        self, df, review_title_col="", review_text_col="", review_rating_col="", chunk_size=20
     ) -> pd.DataFrame:
         columns = [
             (review_title_col, "review_title"),
@@ -40,8 +40,8 @@ class ReviewProcessor:
                 yield chunk_str
 
         collected_responses = []
-        for i, input_str in enumerate(chunk_df(data[:200], 20)):
-            print(f"Working on chunk {i}")
+        for i, input_str in enumerate(chunk_df(data, chunk_size)):
+            # print(f"Working on chunk {i}")
             response = self.model.query(input_str)
             collected_responses.append(response)
 
@@ -77,13 +77,15 @@ def llm_worker(user_id, file_id, aws, logger):
             review_rating_col="reviews.rating",
         )  # TODO: Put these constants in user config somehow
         logger.info(f"Processed file, length of output is: {len(output_df)}")
-        output_json = output_df.to_json(path_or_buf=None)  # return json as str
+        # somehow only to_json gives the right format (?)
+        # just convert back to dict with json.loads
+        output_dict = json.loads(output_df.to_json(path_or_buf=None))
         wrapper_json = {
             "user_id": user_id,
             "file_id": file_id,
             "status": "success",
             "message": "",
-            "results": output_json,
+            "results": output_dict,
         }
     except Exception as e:
         wrapper_json = {
