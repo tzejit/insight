@@ -7,7 +7,13 @@ Simple Flask backend connected to Google's Gemini LLM and AWS S3 + DocumentDB (i
 Install required libraries:
 
 ```bash
-python -m pip install google-generativeai pandas boto3 flask flask-cors pyjwt passlib
+python -m pip install google-generativeai pandas boto3 flask flask-cors pyjwt passlib 
+```
+
+For dev, install additional required libraries:
+
+```bash
+python -m pip install mongomock
 ```
 
 ## Deployment

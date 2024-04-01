@@ -7,6 +7,8 @@ from flask import Flask, json, request
 from datetime import datetime, timedelta, timezone
 from passlib.hash import pbkdf2_sha256
 from flask_cors import CORS
+import uuid
+import mongomock
 
 from aws_interface import AWS
 from data_processing import llm_worker
@@ -61,16 +63,14 @@ def auth(request):
 
 
 def mock_to_db(data):
-    pass
+    collection  = mongomock.MongoClient().db.collection
+    collection.insert_one(data)
 
 
 def mock_get_db(username):
+    collection  = mongomock.MongoClient().db.collection
     try:
-        return {
-            "test": {
-                "password": "$pbkdf2-sha256$29000$wNibszbmHGNMqZWyFkKotQ$8hZRuLv5.OqW4BEqqLmUmUySIvse8/7CXQm/VsufUAQ"
-            }
-        }[username]
+        return collection.find_one({'username': username})
     except:
         return {}
 
@@ -78,9 +78,10 @@ def mock_get_db(username):
 # Example usage of auth
 @app.route("/auth_api", methods=["GET"])
 def auth_api():
-    if not auth(request):
+    payload = auth(request)
+    if not payload[0]:
         return create_error("You are not logged in")
-    return create_response()
+    return create_response(**(payload[1]))
 
 
 @app.route("/get_file_listing/<user_id>", methods=["GET"])
@@ -151,15 +152,18 @@ def signup():
     data = request.json
     username = data["username"]
     password = data["password"]
+    email = data["email"]
 
     hash = pbkdf2_sha256.hash(password)
+    user_uuid = str(uuid.uuid4())
 
     # Save username and hash to db
-    mock_to_db({username: {"password": hash}})
+    mock_to_db({username: {"password": hash, "email": email, "uuid": user_uuid}})
 
     data = {
         "exp": datetime.now(tz=timezone.utc) + timedelta(days=7),
         "username": username,
+        "uuid": user_uuid
     }
     encoded_jwt = jwt.encode(data, jwtSecretKey, algorithm="HS256")
     return create_response(message="success", token=encoded_jwt)
@@ -172,13 +176,14 @@ def login():
     password = data["password"]
 
     # Authenticate with password, get hash from DB
-    hash = mock_get_db(username).get("password", "")
-    if hash == "" or not pbkdf2_sha256.verify(password, hash):
-        return create_error("Password is wrong")
+    user_data = mock_get_db(username)
+    if not user_data or user_data.get("password", "") == "" or not pbkdf2_sha256.verify(password, user_data.get("password", "")):
+        return create_error("User does not exist or password is wrong")
 
     data = {
         "exp": datetime.now(tz=timezone.utc) + timedelta(days=7),
         "username": username,
+        "uuid":  user_data.get("uuid", "")
     }
     encoded_jwt = jwt.encode(data, jwtSecretKey, algorithm="HS256")
     return create_response(message="success", token=encoded_jwt)

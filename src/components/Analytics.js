@@ -5,17 +5,17 @@ import Detailed from './Detailed';
 import Recommendations from './Recommendations';
 
 
-function Analytics({refProp}) {
-  return (
-    <Stack ref={refProp}
-    direction="column"
-    spacing={2}>
-        <Overview/>
-        <Detailed/>
-        <Recommendations/>
-        <Box/>
-    </Stack>
-  );
+function Analytics({ refProp }) {
+    return (
+        <Stack ref={refProp}
+            direction="column"
+            spacing={2}>
+            <Overview />
+            <Detailed />
+            <Recommendations />
+            <Box />
+        </Stack>
+    );
 }
 
 export default Analytics;

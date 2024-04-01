@@ -11,8 +11,8 @@ import YellowButton from '../components/buttons/YellowButton';
 
 function History() {
 
-  return (
-    <ThemeProvider theme={theme}>
+    return (
+        <ThemeProvider theme={theme}>
             <Grid container justifyContent="center" alignItems="center" height='100vh' padding='1em' spacing={1} >
                 <Grid item xs={3} height='100%'>
                     <AppMenu>
@@ -23,20 +23,20 @@ function History() {
                 </Grid>
                 <Grid item xs={9} height='100%'>
                     <Stack alignItems="center" height='100%' spacing={2}>
-                        <Box  width='100%' justifyContent="center" alignItems="center" sx={{backgroundColor: 'grey.main', borderRadius: '0.5em', padding: '0.2em 0'}}>
+                        <Box width='100%' justifyContent="center" alignItems="center" sx={{ backgroundColor: 'grey.main', borderRadius: '0.5em', padding: '0.2em 0' }}>
                             <Typography variant='h5' fontWeight='fontWeightMedium' align='center'>Overview of past generated InSight reports</Typography>
                         </Box>
-                        <Box width='100%' height='100%' justifyContent="center" alignItems="center" sx={{backgroundColor: 'yellow.main', borderRadius: '0.5em', boxSizing: 'border-box', padding: '1em'}}>
+                        <Box width='100%' height='100%' justifyContent="center" alignItems="center" sx={{ backgroundColor: 'yellow.main', borderRadius: '0.5em', boxSizing: 'border-box', padding: '1em' }}>
                             <Box height='inherit' backgroundColor='yellow.secondary' alignItems="center" padding='2.5em 1em' borderRadius='0.5em' boxSizing='border-box'>
-                            <AppTable/>
+                                <AppTable />
                             </Box>
                         </Box>
                     </Stack>
                 </Grid>
             </Grid>
-    </ThemeProvider>
+        </ThemeProvider>
 
-  );
+    );
 }
 
 export default History;
