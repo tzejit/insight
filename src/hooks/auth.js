@@ -18,6 +18,7 @@ function useAuth() {
     const [uuid, setUuid] = useState('')
     useEffect(() => {
         let user = userpool.getCurrentUser();
+        console.log(user)
         if (user) {
             setAuthed(true)
             setPayload(user)
