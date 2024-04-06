@@ -5,6 +5,7 @@ function TextFieldYellow(props) {
     <TextField
     variant="outlined" size="small"
     onChange={props.onChange}
+    type={props.type}
     sx={{
         "& .MuiOutlinedInput-root": {
             backgroundColor: "yellow.secondary",

@@ -34,7 +34,7 @@ function App() {
         });
     };
 
-    const [authed, payload] = useAuth()
+    const [authed, payload, uuid] = useAuth()
 
     const logout = () => {
         localStorage.removeItem('jwt-token')

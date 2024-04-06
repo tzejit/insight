@@ -6,25 +6,22 @@ import './landing.css'
 import theme from '../components/themes/MainTheme';
 import YellowButton from '../components/buttons/YellowButton';
 import useAuth from '../hooks/auth';
-import { useNavigate } from 'react-router-dom';
 import Error from './Error';
 import { useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-
-
+import { useNavigate } from 'react-router-dom';
 
 function Welcome() {
 
-    const [authed, payload] = useAuth()
+    const [authed, payload, uuid] = useAuth()
     const [fileName, setFileName] = useState("")
     const inputRef = useRef(null)
+    const navigate = useNavigate()
 
-    const navigate = useNavigate();
-
-    const logout = () => {
-        localStorage.removeItem('jwt-token')
+    function logout() {
+        payload.signOut();
         navigate('/')
-    }
+    };
 
     if (!authed) {
         return <Error />
@@ -43,17 +40,17 @@ function Welcome() {
     async function handle_upload() {
         const data = new FormData()
         data.append('uploadFile', inputRef.current.files[0])
-        const token = localStorage.getItem('jwt-token')
-        let res = await fetch(`http://127.0.0.1:5000/queue_file/${payload.uuid}/${uuidv4()}`, {
-            method: 'POST',
-            headers: {
-                'jwt-token': token,
-            },
-            body: data
-    
-        })
+        // const token = localStorage.getItem('jwt-token')
+        // let res = await fetch(`http://127.0.0.1:5000/queue_file/${uuid}/${uuidv4()}`, {
+        //     method: 'POST',
+        //     headers: {
+        //         'jwt-token': token,
+        //     },
+        //     body: data
 
-        res = await res.json()
+        // })
+
+        // res = await res.json()
 
     }
 

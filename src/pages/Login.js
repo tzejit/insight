@@ -9,7 +9,7 @@ import InsightTitle from '../components/typography/InsightTitle';
 import BlackButton from '../components/buttons/BlackButton';
 import TextFieldYellow from '../components/inputs/TextFieldYellow';
 import theme from '../components/themes/MainTheme';
-
+import authenticate from '../hooks/authenticate';
 
 function Login() {
     const navigate = useNavigate();
@@ -18,22 +18,14 @@ function Login() {
     const [error, setError] = useState('')
 
     async function loginApiCall() {
-        let res = await fetch('http://127.0.0.1:5000/login', {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({ 'username': username, 'password': password }),
-        })
-        res = await res.json()
-        if (res.message === 'success') {
-            localStorage.setItem('jwt-token', res.token)
+        try {
+            await authenticate(username, password)
             setUsername('')
             setPassword('')
             navigate('/welcome')
-        } else {
-            setError(res.message)
+        } catch(error) {
+            console.log(error)
+            setError(error.message)
         }
     }
 
@@ -49,7 +41,7 @@ function Login() {
                     <Box width="100%">
                         <Typography color='black' variant='body1' fontWeight='fontWeightMedium' align="left">Password</Typography>
                     </Box>
-                    <TextFieldYellow onChange={(e) => setPassword(e.target.value)} />
+                    <TextFieldYellow onChange={(e) => setPassword(e.target.value)} type="password"/>
                     {error ? <Alert severity="error">{error}</Alert> : ''}
                 </Stack>
                 <BlackButton onClick={loginApiCall}>

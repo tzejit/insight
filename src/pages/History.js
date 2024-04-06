@@ -8,8 +8,17 @@ import theme from '../components/themes/MainTheme';
 import BlackButton from '../components/buttons/BlackButton';
 import AppTable from '../components/graphs/AppTable';
 import YellowButton from '../components/buttons/YellowButton';
+import useAuth from '../hooks/auth';
+import Error from './Error';
+
 
 function History() {
+
+    const [authed, payload, uuid] = useAuth()
+
+    if (!authed) {
+        return <Error />
+    }
 
     return (
         <ThemeProvider theme={theme}>
