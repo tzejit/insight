@@ -1,6 +1,5 @@
 import { AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js';
 import userpool from '../components/userpool';
-import { useNavigate } from 'react-router-dom';
 
 export default function authenticate(username,password) {
     return new Promise((resolve,reject)=>{
