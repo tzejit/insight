@@ -61,15 +61,17 @@ function Welcome() {
         const file = inputRef.current.files[0];
         // TODO: (low) Verify that file uploaded is a CSV
 
-        await upload_file(userId, fileId, file);
-
-        // Create a callback for the job status subscription later on
-        // TODO: (medium) Change this to show the user the status of the job
-        const job_progress_callback = (data) => {
-            console.log("Job progress callback", data);
-        };
-
         try {
+            // File upload does NOT automatically trigger a processing job
+            // Refer to submit_job below
+            await upload_file(userId, fileId, file);
+
+            // Create a callback for the job status subscription later on
+            // TODO: (medium) Change this to show the user the status of the job
+            const job_progress_callback = (data) => {
+                console.log("Job progress callback", data);
+            };
+
             // Create a job with the submitted file
             const jobId = await submit_job(userId, fileId);
             setLatestJobId(jobId);
