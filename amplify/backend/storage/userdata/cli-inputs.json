@@ -1,0 +1,13 @@
+{
+  "resourceName": "userdata",
+  "policyUUID": "56d9c388",
+  "bucketName": "insight-user-data",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

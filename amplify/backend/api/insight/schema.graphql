@@ -1,0 +1,41 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+
+# About the !: It means that field is required
+# About AWSJSON: It is a JSON string
+
+# About the ID type:
+# It can be treated as a string, and we can write strings to ID fields
+# It must either be a string or integer -- we can standardize to string
+# Reference: https://spec.graphql.org/October2016/#sec-ID
+
+# About @auth rules:
+# We want to only allow the owners to read/mutate their own jobs
+# We specify ownerField to be "user_id" so Amplify will automatically write the Cognito user ID into user_id
+# This means we do not have to specify it ourselves!
+# Reference: https://docs.amplify.aws/javascript/build-a-backend/graphqlapi/customize-authorization-rules/#per-user--owner-based-data-access
+
+# Job has its own 'id' column (auto-generated, not shown here)
+# user_id will be the secondary index
+type Job @model @auth(rules: [{ allow: owner, ownerField: "user_id" }]) {
+    user_id: ID! @index
+    file_id: ID!
+    job_name: String!
+    job_status: JobStatus!
+    job_config: JobConfig!
+}
+
+type JobConfig {
+    product_name: String!
+    prompt_id: String!
+    review_title_col: String
+    review_text_col: String
+    review_rating_col: String
+}
+
+enum JobStatus {
+    WAITING
+    IN_PROGRESS
+    COMPLETED
+    FAILED
+}
