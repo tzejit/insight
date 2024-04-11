@@ -1,25 +1,25 @@
-import { AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js';
-import userpool from '../components/userpool';
+// import { AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js';
+// import userpool from '../components/userpool';
 
-export default function authenticate(username,password) {
-    return new Promise((resolve,reject)=>{
-        const user=new CognitoUser({
-            Username:username,
-            Pool:userpool
-        });
+// export default function authenticate(username,password) {
+//     return new Promise((resolve,reject)=>{
+//         const user=new CognitoUser({
+//             Username:username,
+//             Pool:userpool
+//         });
 
-        const authDetails= new AuthenticationDetails({
-            Username:username,
-            Password: password
-        });
+//         const authDetails= new AuthenticationDetails({
+//             Username:username,
+//             Password: password
+//         });
 
-        user.authenticateUser(authDetails,{
-            onSuccess:(result)=>{
-                resolve(result);
-            },
-            onFailure:(err)=>{
-                reject(err);
-            }
-        });
-    });
-};
+//         user.authenticateUser(authDetails,{
+//             onSuccess:(result)=>{
+//                 resolve(result);
+//             },
+//             onFailure:(err)=>{
+//                 reject(err);
+//             }
+//         });
+//     });
+// };
