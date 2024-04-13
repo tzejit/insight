@@ -23,7 +23,7 @@ import {
     get_result_url,
 } from "../hooks/dataManagement";
 import { fetch_user_auth_status, do_sign_out } from "../hooks/auth";
-// import Error from "./Error";
+import TextFieldYellow from "../components/inputs/TextFieldYellow";
 
 function Welcome() {
     // const [authed, payload, uuid] = useAuth();
@@ -31,6 +31,8 @@ function Welcome() {
     const [userId, setUserId] = useState("");
     const [fileName, setFileName] = useState("");
     const [latestJobId, setLatestJobId] = useState("");
+    const [productName, setProductName] = useState("");
+
     const inputRef = useRef(null);
     const navigate = useNavigate();
 
@@ -73,7 +75,7 @@ function Welcome() {
             };
 
             // Create a job with the submitted file
-            const jobId = await submit_job(userId, fileId);
+            const jobId = await submit_job(userId, fileId, productName);
             setLatestJobId(jobId);
 
             // The callback is automatically attached to the job status subscription
@@ -231,6 +233,11 @@ function Welcome() {
                                             : "To start a new report, upload your files by dragging and dropping into this area or clicking the button below"}
                                     </i>
                                 </Typography>
+                                {fileName
+                                    ? <TextFieldYellow
+                                        placeholder="Product name"
+                                        onChange={(e) => setProductName(e.target.value)}
+                                    /> : ''}
                                 <Box>
                                     <YellowButton
                                         onClick={() => inputRef.current.click()}
@@ -270,6 +277,8 @@ function Welcome() {
                                 padding="2.5em 1em"
                                 borderRadius="1em"
                                 boxSizing="border-box"
+                                display="flex"
+                                flexDirection="column"
                             >
                                 <Typography
                                     variant="h5"
@@ -280,6 +289,15 @@ function Welcome() {
                                 >
                                     View a historic InSight report
                                 </Typography>
+                                <Box>
+                                    <YellowButton
+                                        onClick={() => navigate('/history')}
+                                        padding="auto"
+                                    >
+                                        View history
+                                    </YellowButton>
+                                </Box>
+
                             </Box>
                         </Box>
                         <YellowButton width="70%" onClick={() => logout()}>

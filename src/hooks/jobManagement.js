@@ -3,7 +3,7 @@ import { createJob } from "../graphql/mutations";
 import { getJob, listJobs } from "../graphql/queries";
 import { onUpdateJob } from "../graphql/subscriptions";
 
-async function submit_job(userId, fileId) {
+async function submit_job(userId, fileId, jobName) {
     if (!userId || !fileId) {
         console.error(
             "Cannot submit job without userId or fileId!",
@@ -22,9 +22,9 @@ async function submit_job(userId, fileId) {
         job_status: "WAITING",
 
         // TODO: (high priority) add input fields for everything below here:
-        job_name: "test_job_name",
+        job_name: jobName,
         job_config: {
-            prompt_id: "prompt.txt",
+            prompt_id: "",
             product_name: "Amazon Kindle",
             review_title_col: "reviews.title",
             review_text_col: "reviews.text",

@@ -13,7 +13,6 @@ import jsPDF from "jspdf";
 import AppMenu from "../components/AppMenu";
 import Analytics from "../components/Analytics";
 import theme from "../components/themes/MainTheme";
-import Error from "./Error";
 import { do_sign_out, fetch_user_auth_status } from "../hooks/auth";
 import "./app.css";
 
@@ -64,10 +63,6 @@ function App() {
         await do_sign_out();
         navigate("/");
     };
-
-    // if (!authed) {
-    //     return <Error />;
-    // }
 
     return (
         <ThemeProvider theme={theme}>
