@@ -32,7 +32,7 @@ async function submit_job(userId, awsId, fileId, jobName) {
         },
     };
 
-    console.info("Submitting new job", fileId);
+    console.info("Submitting new job", newJob);
     try {
         const graphql_res = await client.graphql({
             query: createJob,

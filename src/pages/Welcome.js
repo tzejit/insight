@@ -24,7 +24,6 @@ import {
     get_result_url,
 } from "../hooks/dataManagement";
 import { fetch_auth, fetch_user_auth_status, do_sign_out } from "../hooks/auth";
-import TextFieldYellow from "../components/inputs/TextFieldYellow";
 
 function Welcome() {
     // const [authed, payload, uuid] = useAuth();
