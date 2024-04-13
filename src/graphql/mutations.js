@@ -8,6 +8,7 @@ export const createJob = /* GraphQL */ `
   ) {
     createJob(input: $input, condition: $condition) {
       user_id
+      aws_id
       file_id
       job_name
       job_status
@@ -33,6 +34,7 @@ export const updateJob = /* GraphQL */ `
   ) {
     updateJob(input: $input, condition: $condition) {
       user_id
+      aws_id
       file_id
       job_name
       job_status
@@ -58,6 +60,7 @@ export const deleteJob = /* GraphQL */ `
   ) {
     deleteJob(input: $input, condition: $condition) {
       user_id
+      aws_id
       file_id
       job_name
       job_status

@@ -1,13 +1,13 @@
 import { uploadData, downloadData, getUrl } from "aws-amplify/storage";
 
-async function upload_file(user_id, file_id, file) {
+async function upload_file(file_id, file) {
     // file_id can come with or without .csv suffix (doesn't matter)
     // TODO: Verify that file uploaded is a CSV
     console.debug("Starting upload of file", file_id);
 
     try {
         const uploadTask = uploadData({
-            key: `userdata/${user_id}/${file_id}`, // key NEEDS to be in this format - userId folder then fileId file
+            key: `userdata/${file_id}`, // key NEEDS to be in this format - userId folder then fileId file
             data: file,
             options: {
                 accessLevel: "private", // authorized users only!
@@ -23,7 +23,7 @@ async function upload_file(user_id, file_id, file) {
     }
 }
 
-async function get_result(user_id, job_id) {
+async function get_result(job_id) {
     // Retrieves contents of results
     // This function assumes that the job is 'COMPLETED'
     console.debug("Retrieving results of job", job_id);
@@ -32,7 +32,7 @@ async function get_result(user_id, job_id) {
         // Downloads file content to memory
         // The file name is always ${job_id}.json
         const { body } = await downloadData({
-            key: `results/${user_id}/${job_id}.json`,
+            key: `results/${job_id}.json`,
             options: {
                 accessLevel: "private", // access level of the file being downloaded
                 // TODO: (low) Download progress?
@@ -50,14 +50,14 @@ async function get_result(user_id, job_id) {
     }
 }
 
-async function get_result_url(user_id, job_id) {
+async function get_result_url(job_id) {
     // Retrieves download URL of results as a string
     // This function assumes that the job is 'COMPLETED'
     console.debug("Retrieving results of job", job_id);
 
     try {
         const url_result = await getUrl({
-            key: `results/${user_id}/${job_id}.json`,
+            key: `results/${job_id}.json`,
             options: {
                 accessLevel: "private", // access level of the file being downloaded
                 expiresIn: 60, // 60 seconds for now

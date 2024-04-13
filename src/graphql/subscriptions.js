@@ -8,6 +8,7 @@ export const onCreateJob = /* GraphQL */ `
   ) {
     onCreateJob(filter: $filter, user_id: $user_id) {
       user_id
+      aws_id
       file_id
       job_name
       job_status
@@ -33,6 +34,7 @@ export const onUpdateJob = /* GraphQL */ `
   ) {
     onUpdateJob(filter: $filter, user_id: $user_id) {
       user_id
+      aws_id
       file_id
       job_name
       job_status
@@ -58,6 +60,7 @@ export const onDeleteJob = /* GraphQL */ `
   ) {
     onDeleteJob(filter: $filter, user_id: $user_id) {
       user_id
+      aws_id
       file_id
       job_name
       job_status

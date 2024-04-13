@@ -5,6 +5,7 @@ export const getJob = /* GraphQL */ `
   query GetJob($id: ID!) {
     getJob(id: $id) {
       user_id
+      aws_id
       file_id
       job_name
       job_status
@@ -32,6 +33,38 @@ export const listJobs = /* GraphQL */ `
     listJobs(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         user_id
+        aws_id
+        file_id
+        job_name
+        job_status
+        id
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const jobsByUser_id = /* GraphQL */ `
+  query JobsByUser_id(
+    $user_id: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelJobFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    jobsByUser_id(
+      user_id: $user_id
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        user_id
+        aws_id
         file_id
         job_name
         job_status

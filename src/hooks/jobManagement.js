@@ -1,12 +1,11 @@
 import { generateClient } from "aws-amplify/api";
 import { createJob } from "../graphql/mutations";
 import { getJob, listJobs } from "../graphql/queries";
-import { onUpdateJob } from "../graphql/subscriptions";
 
-async function submit_job(userId, fileId) {
-    if (!userId || !fileId) {
+async function submit_job(userId, awsId, fileId) {
+    if (!userId || !awsId || !fileId) {
         console.error(
-            "Cannot submit job without userId or fileId!",
+            "Cannot submit job without userId, awsId, or fileId!",
             userId,
             fileId
         );
@@ -16,6 +15,7 @@ async function submit_job(userId, fileId) {
     const newJob = {
         // for graphql in general, refer to src/graphql/schema.graphql for more details
         file_id: fileId,
+        aws_id: awsId,
         user_id: userId,
 
         // job_status is actually an enum field, but we just use string so long as it matches enum name
@@ -24,7 +24,7 @@ async function submit_job(userId, fileId) {
         // TODO: (high priority) add input fields for everything below here:
         job_name: "test_job_name",
         job_config: {
-            prompt_id: "prompt.txt",
+            prompt_id: "", // use default prompt
             product_name: "Amazon Kindle",
             review_title_col: "reviews.title",
             review_text_col: "reviews.text",

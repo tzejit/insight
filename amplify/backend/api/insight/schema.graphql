@@ -19,6 +19,7 @@
 # user_id will be the secondary index
 type Job @model @auth(rules: [{ allow: owner, ownerField: "user_id" }]) {
     user_id: ID! @index
+    aws_id: ID!
     file_id: ID!
     job_name: String!
     job_status: JobStatus!

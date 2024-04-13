@@ -22,13 +22,14 @@ import {
     get_result,
     get_result_url,
 } from "../hooks/dataManagement";
-import { fetch_user_auth_status, do_sign_out } from "../hooks/auth";
+import { fetch_auth, fetch_user_auth_status, do_sign_out } from "../hooks/auth";
 // import Error from "./Error";
 
 function Welcome() {
     // const [authed, payload, uuid] = useAuth();
     const [username, setUsername] = useState("");
     const [userId, setUserId] = useState("");
+    const [awsId, setAwsId] = useState("");
     const [fileName, setFileName] = useState("");
     const [latestJobId, setLatestJobId] = useState("");
     const inputRef = useRef(null);
@@ -64,7 +65,7 @@ function Welcome() {
         try {
             // File upload does NOT automatically trigger a processing job
             // Refer to submit_job below
-            await upload_file(userId, fileId, file);
+            await upload_file(fileId, file);
 
             // Create a callback for the job status subscription later on
             // TODO: (medium) Change this to show the user the status of the job
@@ -73,7 +74,7 @@ function Welcome() {
             };
 
             // Create a job with the submitted file
-            const jobId = await submit_job(userId, fileId);
+            const jobId = await submit_job(userId, awsId, fileId);
             setLatestJobId(jobId);
 
             // The callback is automatically attached to the job status subscription
@@ -97,14 +98,11 @@ function Welcome() {
             console.info("User is correctly authenticated");
             setUsername(user_auth_status.username);
             setUserId(user_auth_status.userId);
+            setAwsId(user_auth_status.awsId);
         } else {
             console.warn("User at welcome page but not logged in");
             navigate("/error");
         }
-        get_result_url(
-            "34d87438-9001-7022-11a4-4a52a1126ab5",
-            "8b054c4f-9c49-438b-925f-98d5b4aa4cba"
-        );
     };
     useEffect(() => {
         pageLoadAuthVerification();

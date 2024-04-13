@@ -1,112 +1,162 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: CloudFormation template for EventBridge Pipes
-Resources:
-  Roleec7247d9:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: Amazon_EventBridge_Pipe_insight-job-pipe1eee25c4
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: pipes.amazonaws.com
-            Action: sts:AssumeRole
-            Condition:
-              StringEquals:
-                aws:SourceArn:
-                  Fn::Sub: >-
-                    arn:${AWS::Partition}:pipes:${AWS::Region}:${AWS::AccountId}:pipe/insight-job-pipe
-                aws:SourceAccount:
-                  Fn::Sub: ${AWS::AccountId}
-      MaxSessionDuration: 3600
-      Tags: []
-  Policy7a40707e:
-    Type: AWS::IAM::RolePolicy
-    Properties:
-      PolicyName: LambdaPipeTargetTemplate46f0c74e
-      RoleName:
-        Ref: Roleec7247d9
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action:
-              - lambda:InvokeFunction
-            Resource:
-              - Fn::Sub: >-
-                  arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:insight-process-data
-  Policy026d9a2c:
-    Type: AWS::IAM::RolePolicy
-    Properties:
-      PolicyName: DynamoDbPipeSourceTemplatec5803542
-      RoleName:
-        Ref: Roleec7247d9
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action:
-              - dynamodb:DescribeStream
-              - dynamodb:GetRecords
-              - dynamodb:GetShardIterator
-              - dynamodb:ListStreams
-            Resource:
-              - Fn::Sub: >-
-                  arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Job-wqkmymbwnrb7vpsstjnpfnvlry-dev/stream/2024-04-11T10:21:51.879
-  Pipe42871246:
-    Type: AWS::Pipes::Pipe
-    DependsOn:
-      - Roleec7247d9
-      - Policy7a40707e
-      - Policy026d9a2c
-    Properties:
-      RoleArn:
-        Fn::GetAtt:
-          - Roleec7247d9
-          - Arn
-      Name: insight-job-pipe
-      DesiredState: RUNNING
-      Source:
-        Fn::Sub: >-
-          arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Job-wqkmymbwnrb7vpsstjnpfnvlry-dev/stream/2024-04-11T10:21:51.879
-      SourceParameters:
-        DynamoDBStreamParameters:
-          BatchSize: 1
-          StartingPosition: LATEST
-        FilterCriteria:
-          Filters:
-            - Pattern: >-
-                {"dynamodb":{"NewImage":{"job_status":{"S":["WAITING"]}}},"eventName":["INSERT"],"eventSource":["aws:dynamodb"]}
-      LogConfiguration:
-        CloudwatchLogsLogDestination:
-          LogGroupArn:
-            Fn::Sub: >-
-              arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/vendedlogs/pipes/insight-job-pipe
-        IncludeExecutionData:
-          - ALL
-        Level: INFO
-      TargetParameters:
-        InputTemplate: |-
-          {
-            "id": <$.dynamodb.NewImage.id.S>,
-            "user_id": <$.dynamodb.NewImage.user_id.S>,
-            "file_id": <$.dynamodb.NewImage.file_id.S>,
-            "job_name": <$.dynamodb.NewImage.job_name.S>,
-            "job_status": <$.dynamodb.NewImage.job_status.S>,
-            "job_config": {
-              "product_name": <$.dynamodb.NewImage.job_config.M.product_name.S>,
-              "prompt_id": <$.dynamodb.NewImage.job_config.M.prompt_id.S>,
-              "review_title_col": <$.dynamodb.NewImage.job_config.M.review_title_col.S>,
-              "review_text_col": <$.dynamodb.NewImage.job_config.M.review_text_col.S>,
-              "review_rating_col": <$.dynamodb.NewImage.job_config.M.review_rating_col.S>
-            },
-            "createdAt": <$.dynamodb.NewImage.createdAt.S>,
-            "updatedAt": <$.dynamodb.NewImage.updatedAt.S>
-          }
-        LambdaFunctionParameters:
-          InvocationType: FIRE_AND_FORGET
-      Target:
-        Fn::Sub: >-
-          arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:insight-process-data
-Parameters: {}
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "CloudFormation template for EventBridge Pipes",
+    "Resources":
+        {
+            "Rolef08824dd":
+                {
+                    "Type": "AWS::IAM::Role",
+                    "Properties":
+                        {
+                            "RoleName": "Amazon_EventBridge_Pipe_insight-job-pipe21fda401",
+                            "AssumeRolePolicyDocument":
+                                {
+                                    "Version": "2012-10-17",
+                                    "Statement":
+                                        [
+                                            {
+                                                "Effect": "Allow",
+                                                "Principal":
+                                                    {
+                                                        "Service": "pipes.amazonaws.com",
+                                                    },
+                                                "Action": "sts:AssumeRole",
+                                                "Condition":
+                                                    {
+                                                        "StringEquals":
+                                                            {
+                                                                "aws:SourceArn":
+                                                                    {
+                                                                        "Fn::Sub": "arn:${AWS::Partition}:pipes:${AWS::Region}:${AWS::AccountId}:pipe/insight-job-pipe",
+                                                                    },
+                                                                "aws:SourceAccount":
+                                                                    {
+                                                                        "Fn::Sub": "${AWS::AccountId}",
+                                                                    },
+                                                            },
+                                                    },
+                                            },
+                                        ],
+                                },
+                            "MaxSessionDuration": 3600,
+                            "Tags": [],
+                        },
+                },
+            "Policy14a628ec":
+                {
+                    "Type": "AWS::IAM::RolePolicy",
+                    "Properties":
+                        {
+                            "PolicyName": "LambdaPipeTargetTemplateff98242e",
+                            "RoleName": { "Ref": "Rolef08824dd" },
+                            "PolicyDocument":
+                                {
+                                    "Version": "2012-10-17",
+                                    "Statement":
+                                        [
+                                            {
+                                                "Effect": "Allow",
+                                                "Action":
+                                                    ["lambda:InvokeFunction"],
+                                                "Resource":
+                                                    [
+                                                        {
+                                                            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:insight-process-data",
+                                                        },
+                                                    ],
+                                            },
+                                        ],
+                                },
+                        },
+                },
+            "Policy9d5f3c5e":
+                {
+                    "Type": "AWS::IAM::RolePolicy",
+                    "Properties":
+                        {
+                            "PolicyName": "DynamoDbPipeSourceTemplated632c34a",
+                            "RoleName": { "Ref": "Rolef08824dd" },
+                            "PolicyDocument":
+                                {
+                                    "Version": "2012-10-17",
+                                    "Statement":
+                                        [
+                                            {
+                                                "Effect": "Allow",
+                                                "Action":
+                                                    [
+                                                        "dynamodb:DescribeStream",
+                                                        "dynamodb:GetRecords",
+                                                        "dynamodb:GetShardIterator",
+                                                        "dynamodb:ListStreams",
+                                                    ],
+                                                "Resource":
+                                                    [
+                                                        {
+                                                            "Fn::Sub": "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Job-wqkmymbwnrb7vpsstjnpfnvlry-dev/stream/2024-04-11T10:21:51.879",
+                                                        },
+                                                    ],
+                                            },
+                                        ],
+                                },
+                        },
+                },
+            "Pipe15b6824b":
+                {
+                    "Type": "AWS::Pipes::Pipe",
+                    "DependsOn":
+                        ["Rolef08824dd", "Policy14a628ec", "Policy9d5f3c5e"],
+                    "Properties":
+                        {
+                            "RoleArn":
+                                { "Fn::GetAtt": ["Rolef08824dd", "Arn"] },
+                            "Name": "insight-job-pipe",
+                            "DesiredState": "RUNNING",
+                            "Source":
+                                {
+                                    "Fn::Sub": "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Job-wqkmymbwnrb7vpsstjnpfnvlry-dev/stream/2024-04-11T10:21:51.879",
+                                },
+                            "SourceParameters":
+                                {
+                                    "DynamoDBStreamParameters":
+                                        {
+                                            "BatchSize": 1,
+                                            "StartingPosition": "LATEST",
+                                        },
+                                    "FilterCriteria":
+                                        {
+                                            "Filters":
+                                                [
+                                                    {
+                                                        "Pattern": '{"dynamodb":{"NewImage":{"job_status":{"S":["WAITING"]}}},"eventName":["INSERT"],"eventSource":["aws:dynamodb"]}',
+                                                    },
+                                                ],
+                                        },
+                                },
+                            "LogConfiguration":
+                                {
+                                    "CloudwatchLogsLogDestination":
+                                        {
+                                            "LogGroupArn":
+                                                {
+                                                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/vendedlogs/pipes/insight-job-pipe",
+                                                },
+                                        },
+                                    "IncludeExecutionData": ["ALL"],
+                                    "Level": "INFO",
+                                },
+                            "TargetParameters":
+                                {
+                                    "InputTemplate": "{\n  \"id\": <$.dynamodb.NewImage.id.S>,\n  \"user_id\": <$.dynamodb.NewImage.user_id.S>,\n  \"aws_id\": <$.dynamodb.NewImage.aws_id.S>,\n  \"file_id\": <$.dynamodb.NewImage.file_id.S>,\n  \"job_name\": <$.dynamodb.NewImage.job_name.S>,\n  \"job_status\": <$.dynamodb.NewImage.job_status.S>,\n  \"job_config\": {\n    \"product_name\": <$.dynamodb.NewImage.job_config.M.product_name.S>,\n    \"prompt_id\": <$.dynamodb.NewImage.job_config.M.prompt_id.S>,\n    \"review_title_col\": <$.dynamodb.NewImage.job_config.M.review_title_col.S>,\n    \"review_text_col\": <$.dynamodb.NewImage.job_config.M.review_text_col.S>,\n    \"review_rating_col\": <$.dynamodb.NewImage.job_config.M.review_rating_col.S>\n  },\n  \"createdAt\": <$.dynamodb.NewImage.createdAt.S>,\n  \"updatedAt\": <$.dynamodb.NewImage.updatedAt.S>\n}",
+                                    "LambdaFunctionParameters":
+                                        { "InvocationType": "FIRE_AND_FORGET" },
+                                },
+                            "Target":
+                                {
+                                    "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:insight-process-data",
+                                },
+                        },
+                },
+        },
+    "Parameters": {},
+}
