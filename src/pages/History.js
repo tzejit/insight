@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Grid from "@mui/material/Grid";
@@ -13,20 +13,42 @@ import AppTable from "../components/graphs/AppTable";
 import YellowButton from "../components/buttons/YellowButton";
 import { do_sign_out, fetch_user_auth_status } from "../hooks/auth";
 import "./landing.css";
-import Error from "./Error";
+import {
+    get_job,
+    list_jobs,
+} from "../hooks/jobManagement";
 
 function History() {
     const navigate = useNavigate();
+    const [jobList, setJobList] = useState(null);
 
     // RUN BEFORE PAGE LOADS
-    useEffect(async () => {
-        console.info("Running pre-page load check");
-        const is_authed = (await fetch_user_auth_status()).is_authed;
-        if (!is_authed) {
-            console.info("User at History but not logged in");
-            navigate("/error");
+    useEffect(() => {
+        async function fetchHistory() {
+            console.info("Running pre-page load check");
+            const user_auth_status = await fetch_user_auth_status();
+            if (!user_auth_status.is_authed) {
+                console.info("User at History but not logged in");
+                navigate("/error");
+            } else {
+                const userId = user_auth_status.userId;
+                const jobs = await list_jobs(userId);
+                let promises = []
+                jobs.forEach(e => {
+                    promises.push(get_job(e.id))
+                });
+                const rawJobs = await Promise.all(promises);
+                const tempJobList = []
+                rawJobs.forEach(e => {
+                    tempJobList.push({date: e.createdAt, title: e.job_name, file: e.file_id, name: e.job_config.product_name})
+                })
+                setJobList(tempJobList)
+            } 
         }
+        fetchHistory()
+        console.log(jobList)
     }, []);
+
 
     return (
         <ThemeProvider theme={theme}>
@@ -87,7 +109,7 @@ function History() {
                                 borderRadius="0.5em"
                                 boxSizing="border-box"
                             >
-                                <AppTable />
+                                <AppTable rows={jobList}/>
                             </Box>
                         </Box>
                     </Stack>

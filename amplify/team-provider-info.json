@@ -20,6 +20,12 @@
       },
       "storage": {
         "userdata": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d2gdrhzut6qn7n",
+          "type": "manual"
+        }
       }
     }
   }

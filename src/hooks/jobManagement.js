@@ -2,7 +2,7 @@ import { generateClient } from "aws-amplify/api";
 import { createJob } from "../graphql/mutations";
 import { getJob, listJobs } from "../graphql/queries";
 
-async function submit_job(userId, awsId, fileId) {
+async function submit_job(userId, awsId, fileId, jobName) {
     if (!userId || !awsId || !fileId) {
         console.error(
             "Cannot submit job without userId, awsId, or fileId!",
@@ -22,7 +22,7 @@ async function submit_job(userId, awsId, fileId) {
         job_status: "WAITING",
 
         // TODO: (high priority) add input fields for everything below here:
-        job_name: "test_job_name",
+        job_name: jobName,
         job_config: {
             prompt_id: "", // use default prompt
             product_name: "Amazon Kindle",
