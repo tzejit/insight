@@ -16,6 +16,7 @@
 # Reference: https://docs.amplify.aws/javascript/build-a-backend/graphqlapi/customize-authorization-rules/#per-user--owner-based-data-access
 
 # Job has its own 'id' column (auto-generated, not shown here)
+# user_id will be the secondary index
 type Job @model @auth(rules: [{ allow: owner, ownerField: "user_id" }]) {
     user_id: ID! @index
     aws_id: ID!
