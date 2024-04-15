@@ -66,7 +66,8 @@ function App() {
         async function fetchResult() {
             await pageLoadAuthVerification();
             const latestJob = await list_jobs(userId);
-            setResults(await get_result(latestJob[0].id))
+            let res = await get_result(latestJob[0].id)
+            setResults(JSON.parse(res));
         }
         fetchResult()
     }, []);
@@ -252,7 +253,7 @@ function App() {
                         </AppMenu>
                     </Grid>
                     <Grid item xs={9}>
-                        <Analytics refProp={pdfRef} />
+                        <Analytics refProp={pdfRef} data={results}/>
                     </Grid>
                 </Grid>
             </Box>
