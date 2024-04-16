@@ -53,7 +53,7 @@ async function get_result(job_id) {
 async function get_result_url(job_id) {
     // Retrieves download URL of results as a string
     // This function assumes that the job is 'COMPLETED'
-    console.debug("Retrieving results of job", job_id);
+    console.debug("Retrieving results of job as download URL", job_id);
 
     try {
         const url_result = await getUrl({
@@ -68,8 +68,63 @@ async function get_result_url(job_id) {
         console.info("Expires at", url_result.expiresAt);
         return url_result.url.href;
     } catch (error) {
+        console.error("Error getting download URL", error);
+    }
+}
+
+async function get_raw_result(job_id) {
+    // Retrieves contents of RAW results
+    // This function assumes that the job is 'COMPLETED'
+    console.debug("Retrieving raw results of job", job_id);
+
+    try {
+        // Downloads file content to memory
+        // The file name is always ${job_id}.json
+        const { body } = await downloadData({
+            key: `raw_results/${job_id}.json`,
+            options: {
+                accessLevel: "private", // access level of the file being downloaded
+                // TODO: (low) Download progress?
+                // onProgress: (event) => {
+                //     console.log(event.transferredBytes);
+                // }, // optional progress callback
+            },
+        }).result;
+
+        const result_json = await body.text();
+        console.info("Download success", result_json);
+        return result_json;
+    } catch (error) {
         console.error("Error downloading file", error);
     }
 }
 
-export { upload_file, get_result, get_result_url };
+async function get_raw_result_url(job_id) {
+    // Retrieves download URL of RAW results as a string
+    // This function assumes that the job is 'COMPLETED'
+    console.debug("Retrieving raw results of job as download URL", job_id);
+
+    try {
+        const url_result = await getUrl({
+            key: `raw_results/${job_id}.json`,
+            options: {
+                accessLevel: "private", // access level of the file being downloaded
+                expiresIn: 60, // 60 seconds for now
+            },
+        });
+
+        console.info("Download URL retrieved", url_result.url.href);
+        console.info("Expires at", url_result.expiresAt);
+        return url_result.url.href;
+    } catch (error) {
+        console.error("Error getting download URL", error);
+    }
+}
+
+export {
+    upload_file,
+    get_result,
+    get_raw_result,
+    get_result_url,
+    get_raw_result_url,
+};
