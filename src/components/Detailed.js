@@ -5,7 +5,34 @@ import AnalyticsHeader from './typography/AnalyticsHeader';
 import GraphTitle from './typography/GraphTitle';
 import BarGraph from './graphs/BarGraph';
 
-function Detailed() {
+function Detailed({ data }) {
+
+    function prepData(data, order) {
+        let sortable = []
+        for (let senti in data.sentiment) {
+
+            sortable.push([senti, data.sentiment[senti], data.frequency[senti]])
+        }
+
+        sortable.sort((a, b) => a[1] - b[1] === 0 ? (b[2] - a[2]) * -Math.sign(a[1]) : a[1] - b[1]);
+
+        let sorted_slice;
+        switch(order) {
+            case 1:
+                sorted_slice = sortable.slice(0, 5)
+                break
+            case -1:
+                sorted_slice = sortable.slice(-5).reverse()
+                break
+            default:
+                sorted_slice = sortable.sort((a, b) => Math.abs(a[1]) - Math.abs(b[1]) === 0 ? (b[2] - a[2]) : Math.abs(a[1]) - Math.abs(b[1])).slice(0, 5)
+        }
+
+        let output = []
+        sorted_slice.forEach(kw => output.push({name: kw[0], sentiment: kw[1], frequency: kw[2]}))
+        return output
+    }
+
     return (
         <Stack
             direction="column"
@@ -14,20 +41,22 @@ function Detailed() {
                 <AnalyticsHeader variant='h5'>Product selection</AnalyticsHeader>
             </Box>
 
-            <Grid container boxSizing='border-box' width='inherit'>
-                <Grid item xs={6}>
+            <Stack
+            direction="column"
+            spacing={2} container boxSizing='border-box' width='inherit'>
                     <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginRight='0.5em' id="positivereviews">
                         <GraphTitle variant='subtitle1'>Top 5 most positive rated products</GraphTitle>
-                        <Waterfall />
+                        <BarGraph data={prepData(data, -1)}/>
                     </Box>
-                </Grid>
-                <Grid item xs={6}>
                     <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginLeft='0.5em' id="negativereviews">
                         <GraphTitle variant='subtitle1'>Top 5 most negative rated products</GraphTitle>
-                        <Waterfall />
+                        <BarGraph data={prepData(data, 1)}/>
                     </Box>
-                </Grid>
-            </Grid>
+                    <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginLeft='0.5em' id="negativereviews">
+                        <GraphTitle variant='subtitle1'>Top 5 neutral rated products</GraphTitle>
+                        <BarGraph data={prepData(data, 0)}/>
+                    </Box>
+            </Stack>
             <Box bgcolor="yellow.main" padding='0 0.5em' borderRadius='0.5em' display='flex' alignItems='center' justifyContent='space-between'>
                 <Typography variant='body1' fontWeight='fontWeightMedium'>Select product for in-depth sentiment analysis</Typography>
                 <Select size="small" sx={{

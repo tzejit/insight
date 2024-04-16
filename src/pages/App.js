@@ -15,11 +15,17 @@ import Analytics from "../components/Analytics";
 import theme from "../components/themes/MainTheme";
 import { do_sign_out, fetch_user_auth_status } from "../hooks/auth";
 import "./app.css";
+import { get_result } from "../hooks/dataManagement";
+import {
+    list_jobs
+} from "../hooks/jobManagement";
 
 function App() {
     const pdfRef = useRef(null);
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
+    const [userId, setUserId] = useState("");
+    const [results, setResults] = useState("");
 
     const handleDownloadPDF = () => {
         html2canvas(pdfRef.current).then((canvas) => {
@@ -50,13 +56,20 @@ function App() {
         const user_auth_status = await fetch_user_auth_status();
         if (user_auth_status.is_authed) {
             setUsername(user_auth_status.username);
+            setUserId(user_auth_status.userId);
         } else {
             console.warn("User at app but not logged in");
             navigate("/error");
         }
     };
     useEffect(() => {
-        pageLoadAuthVerification();
+        async function fetchResult() {
+            await pageLoadAuthVerification();
+            const latestJob = await list_jobs(userId);
+            let res = await get_result(latestJob[0].id)
+            setResults(JSON.parse(res));
+        }
+        fetchResult()
     }, []);
 
     const logout = async () => {
@@ -240,7 +253,7 @@ function App() {
                         </AppMenu>
                     </Grid>
                     <Grid item xs={9}>
-                        <Analytics refProp={pdfRef} />
+                        <Analytics refProp={pdfRef} data={results}/>
                     </Grid>
                 </Grid>
             </Box>

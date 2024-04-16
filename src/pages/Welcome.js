@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
+import Alert from "@mui/material/Alert";
 import Grid from "@mui/material/Grid";
 import { ThemeProvider } from "@mui/material/styles";
 import { Typography, Avatar, Box } from "@mui/material";
 import Stack from "@mui/material/Stack";
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 // import { v4 as uuidv4 } from "uuid";
 
@@ -33,6 +35,9 @@ function Welcome() {
     const [fileName, setFileName] = useState("");
     const [latestJobId, setLatestJobId] = useState("");
     const [productName, setProductName] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
 
     const inputRef = useRef(null);
     const navigate = useNavigate();
@@ -63,16 +68,25 @@ function Welcome() {
         const fileId = fileName; // with or without .csv (doesn't matter)
         const file = inputRef.current.files[0];
         // TODO: (low) Verify that file uploaded is a CSV
+        if (productName === '') {
+            setError('Product name is empty');
+            return
+        }
+        setError('');
 
         try {
             // File upload does NOT automatically trigger a processing job
             // Refer to submit_job below
+            setLoading(true);
             await upload_file(fileId, file);
-
+            
             // Create a callback for the job status subscription later on
             // TODO: (medium) Change this to show the user the status of the job
             const job_progress_callback = (data) => {
-                console.log("Job progress callback", data);
+                if (data == "COMPLETED" || data == "FAILED") {
+                    setLoading(false);
+                    setSuccess(true);
+                }
             };
 
             // Create a job with the submitted file
@@ -241,7 +255,8 @@ function Welcome() {
                                 ) : (
                                     ""
                                 )}
-                                <Box>
+                                {error ? <Alert severity="error">{error}</Alert> : ""}
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <YellowButton
                                         onClick={() => inputRef.current.click()}
                                         padding="auto"
@@ -249,15 +264,31 @@ function Welcome() {
                                         Upload
                                     </YellowButton>
                                     {fileName ? (
-                                        <YellowButton
-                                            onClick={handle_upload}
-                                            padding="auto"
-                                        >
-                                            Submit
-                                        </YellowButton>
+                                        <Box sx={{ m: 1, position: 'relative' }}>
+                                            <YellowButton
+                                                onClick={success ? () => navigate('/dashboard') : handle_upload}
+                                                padding="auto"
+                                                disabled={loading}
+                                            >
+                                                {success ? 'View' : 'Submit'}
+                                            </YellowButton>
+                                            {loading && (
+                                                <CircularProgress
+                                                    size={24}
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        top: '50%',
+                                                        left: '50%',
+                                                        marginTop: '-12px',
+                                                        marginLeft: '-12px',
+                                                    }}
+                                                />
+                                            )}
+                                        </Box>
                                     ) : (
                                         ""
                                     )}
+
                                 </Box>
                             </Box>
                         </Box>
