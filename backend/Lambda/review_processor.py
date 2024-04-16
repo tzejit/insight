@@ -4,10 +4,12 @@ import requests
 import logging
 import pandas as pd
 
+logging.basicConfig()
 logger = logging.getLogger()
-logger.setLevel("INFO")
+logger.setLevel(logging.DEBUG)
 
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key="
+
 
 class ReviewProcessor:
     def __init__(self, job_id, prompt_template, job_config):
@@ -18,12 +20,17 @@ class ReviewProcessor:
         self.job_id = job_id
         self.API_KEY = os.environ.get("GOOGLE_API_KEY")
         if "{{INPUT_DATA}}" not in prompt_template:
-            logger.error(f"[{self.job_id}]" + "{{INPUT_DATA}} field is required in prompt template")
+            logger.error(
+                f"[{self.job_id}]"
+                + "{{INPUT_DATA}} field is required in prompt template"
+            )
             raise KeyError("{{INPUT_DATA}} field is required in prompt template")
         self.prompt_template = prompt_template
         self.job_config = job_config
         if "product_name" in job_config:
-            self.prompt_template = self.prompt_template.replace("{{PRODUCT_NAME}}", job_config["product_name"])
+            self.prompt_template = self.prompt_template.replace(
+                "{{PRODUCT_NAME}}", job_config["product_name"]
+            )
 
     def query_model(self, query) -> str:
         if self.prompt_template is not None:
@@ -39,12 +46,10 @@ class ReviewProcessor:
         }
 
         response = requests.post(url, headers=headers, json=data).json()
-        answer = response['candidates'][0]['content']['parts'][0]['text']
+        answer = response["candidates"][0]["content"]["parts"][0]["text"]
         return answer  # will likely be a dictionary in string form
 
-    def process_data(
-        self, df
-    ) -> pd.DataFrame:
+    def process_data(self, df):
         logger.info(f"[{self.job_id}] Starting data processing")
         columns = [
             (self.job_config["review_title_col"], "review_title"),
@@ -68,7 +73,7 @@ class ReviewProcessor:
         # chunk input data and send to Gemini for processing
         logger.info(f"[{self.job_id}] Data has length of {len(data)}")
         collected_responses = []
-        for i, input_str in enumerate(chunk_df(data[:200], 20)):
+        for i, input_str in enumerate(chunk_df(data, 25)):
             logger.debug(f"{self.job_id}: Working on chunk {i}")
             response = self.query_model(input_str)
             logger.debug("Response preview: " + str(response))
@@ -76,19 +81,71 @@ class ReviewProcessor:
         logger.info(f"[{self.job_id}] LLM done processing all chunks")
 
         # merge all responses into a single dataframe
-        summary_df = None
-        for summary_str in collected_responses:
-            # the "common_topics" key should exist (esp. with temperature=0)
-            summary = json.loads(summary_str)["common_topics"]
-            if summary_df is not None:
-                summary_df = pd.concat([summary_df, pd.DataFrame.from_records(summary)])
+        raw_df = None
+        MAX_FIX_ATTEMPTS = 5
+        for raw_str in collected_responses:
+            # attempt to fix a common LLM error where it runs out of output tokens
+            fix_attempts = 0
+            while fix_attempts < MAX_FIX_ATTEMPTS:
+                try:
+                    # the "common_topics" key should exist (esp. with temperature=0)
+                    raw_dict = json.loads(raw_str)["common_topics"]
+                    break
+                except json.decoder.JSONDecodeError:
+                    logger.debug(
+                        "Failed to read JSON str - fix attempts:" + str(fix_attempts)
+                    )
+                    raw_str = "},".join(raw_str.split("},")[:-1]) + "}]}"
+                    logger.debug(raw_str)
+                    fix_attempts += 1
+                    if fix_attempts == MAX_FIX_ATTEMPTS:
+                        logger.error(
+                            f"Failed to read JSON str after {MAX_FIX_ATTEMPTS} attempts, skipping"
+                        )
+                except Exception as e:
+                    # if any other error, no chance of fixing - just dump this particular str
+                    logger.error("Failed to read JSON str - unknown error")
+                    logger.error(e)
+                    continue
+
+            if raw_df is not None:
+                raw_df = pd.concat([raw_df, pd.DataFrame.from_records(raw_dict)])
             else:
-                summary_df = pd.DataFrame.from_records(summary)
+                raw_df = pd.DataFrame.from_records(raw_dict)
         logger.info(f"{self.job_id}: Merged all processed data")
-        
+
+        # turn underscores into spaces in topics
+        raw_df["topic"] = raw_df["topic"].apply(lambda x: x.replace("_", " "))
+
         # turn into desired output format
         output_df = pd.DataFrame()
-        output_df["frequency"] = summary_df.groupby("topic")["frequency"].sum()
-        output_df["sentiment"] = summary_df.groupby("topic")["sentiment"].mean()
-        return output_df
+        output_df["frequency"] = raw_df.groupby("topic")["frequency"].sum()
+        output_df["sentiment"] = raw_df.groupby("topic")["sentiment"].mean()
 
+        # return both dfs
+        return output_df, raw_df
+
+
+if __name__ == "__main__":
+    os.environ["GOOGLE_API_KEY"] = "AIzaSyB30Fptqtj4kDp9qgEkKWQAiDPinjPtmdM"
+    with open("backend/Lambda/prompt.txt", "r") as f:
+        prompt_template = f.read()
+    processor = ReviewProcessor(
+        "jobid",
+        prompt_template,
+        dict(
+            product_name="Amazon Kindle",
+            review_title_col="reviews.title",
+            review_text_col="reviews.text",
+            review_rating_col="reviews.rating",
+        ),
+    )
+
+    # FOR LOCAL DEBUGGING
+    # for mth in ("feb", "mar", "apr"):
+    #     print("#" * 300)
+    #     print("Working on", mth)
+    #     df = pd.read_csv(f"C:\\Users\\JunYou\\Downloads\\reviews\\{mth}_reviews.csv")
+    #     output_df, raw_df = processor.process_data(df)
+    #     output_df.to_json(f"C:\\Users\\JunYou\\Downloads\\reviews\\{mth}_results.json")
+    #     raw_df.to_csv(f"C:\\Users\\JunYou\\Downloads\\reviews\\{mth}_summary.csv")

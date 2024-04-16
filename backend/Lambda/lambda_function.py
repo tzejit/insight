@@ -14,18 +14,24 @@ DATA_BUCKET = "insight-user-dataa6098-dev"
 DATA_DIR = "userdata"
 PROMPT_DIR = "prompts"
 RESULT_DIR = "results"
+RAWRESULT_DIR = "raw_results"
 
 # DYNAMODB TABLE NAME
 DDB_JOB_TABLE = "Job-wqkmymbwnrb7vpsstjnpfnvlry-dev"
 
 
 def gen_file_path(category, aws_id, file_id):
-    if category not in ("data", "prompts", "results"):
+    if category not in ("data", "prompts", "results", "rawresults"):
         raise TypeError(
-            f"Category must be one of ('data', 'prompts', 'results'), received {category}"
+            f"Category must be one of ('data', 'prompts', 'results', 'rawresults'), received {category}"
         )
     else:
-        mapper = {"data": DATA_DIR, "prompts": PROMPT_DIR, "results": RESULT_DIR}
+        mapper = {
+            "data": DATA_DIR,
+            "prompts": PROMPT_DIR,
+            "results": RESULT_DIR,
+            "rawresults": RAWRESULT_DIR,
+        }
         category_dir = mapper[category]
         return f"private/{aws_id}/{category_dir}/{file_id}"
 
@@ -66,13 +72,19 @@ def get_file_df(aws_id, file_id):
     return df
 
 
-def upload_results_to_s3(job_id, aws_id, output_df):
+def upload_dataframe_to_s3(job_id, aws_id, category, df):
+    if category not in ("results", "rawresults"):
+        raise TypeError(
+            f"Category must be one of ('results', 'rawresults'), received {category}"
+        )
+
     res_name = str(job_id) + ".json"  # should already be string, but just in case
-    res_path = gen_file_path("results", aws_id, res_name)
-    tmpfile = io.StringIO()
-    output_df.to_json(tmpfile)  # write dataframe to a temp file
-    obj = boto3.resource("s3").Object(DATA_BUCKET, res_path)
+    res_path = gen_file_path(category, aws_id, res_name)
     logger.info(f"[{job_id}] Uploading results to {res_name}")
+
+    tmpfile = io.StringIO()
+    df.to_json(tmpfile)  # write dataframe to a temp file
+    obj = boto3.resource("s3").Object(DATA_BUCKET, res_path)
     obj.put(Body=tmpfile.getvalue())  # upload temp file to S3
 
 
@@ -146,8 +158,9 @@ def lambda_handler(event, context):
     )
     try:
         update_job_status(job_id, "IN_PROGRESS")
-        output_df = process_job(job_id, aws_id, file_id, job_config)
-        upload_results_to_s3(job_id, aws_id, output_df)  # upload to S3
+        output_df, raw_output_df = process_job(job_id, aws_id, file_id, job_config)
+        upload_dataframe_to_s3(job_id, aws_id, "results", output_df)  # upload to S3
+        upload_dataframe_to_s3(job_id, aws_id, "rawresults", raw_output_df)
         update_job_status(job_id, "COMPLETED")
     except Exception as e:
         update_job_status(job_id, "FAILED")
