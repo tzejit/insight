@@ -4,12 +4,14 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
+import { useNavigate } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
 import { Box } from "@mui/material";
+import BlackButton from '../buttons/BlackButton';
 
 
 function AppTable({ rows }) {
+    const navigate = useNavigate();
 
     if (rows === null) {
         return (
@@ -31,6 +33,7 @@ function AppTable({ rows }) {
                         <TableCell sx={{ border: 0 }}>Report title</TableCell>
                         <TableCell sx={{ border: 0 }}>Uploaded data file name</TableCell>
                         <TableCell sx={{ border: 0 }}>Product name</TableCell>
+                        <TableCell sx={{ border: 0 }}>View</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -51,6 +54,7 @@ function AppTable({ rows }) {
                                 <TableCell sx={{ border: 0 }}>{row.title}</TableCell>
                                 <TableCell sx={{ border: 0 }}>{row.file}</TableCell>
                                 <TableCell sx={{ border: 0 }}>{row.name}</TableCell>
+                                <TableCell sx={{ border: 0 }} onClick={()=>navigate(`/dashboard?id=${row.id}`)}><BlackButton>Link</BlackButton></TableCell>
                                 {/* <TableCell sx={{border: 0}}>
                     <Checkbox iconStyle={{fill: 'white'}} sx={{
                                 paddingLeft: 0,

@@ -33,20 +33,16 @@ function History() {
             } else {
                 const userId = user_auth_status.userId;
                 const jobs = await list_jobs(userId);
-                let promises = []
-                jobs.forEach(e => {
-                    promises.push(get_job(e.id))
-                });
-                const rawJobs = await Promise.all(promises);
                 const tempJobList = []
-                rawJobs.forEach(e => {
-                    tempJobList.push({date: e.createdAt, title: e.job_name, file: e.file_id, name: e.job_config.product_name})
-                })
+                for (let e in jobs){
+                    let job = await get_job(jobs[e].id);
+                    tempJobList.push({date: job.createdAt, title: job.job_name, file: job.file_id, name: job.job_config.product_name, id:jobs[e].id})
+                }
+
                 setJobList(tempJobList)
             } 
         }
         fetchHistory()
-        console.log(jobList)
     }, []);
 
 

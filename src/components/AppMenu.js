@@ -1,8 +1,10 @@
 import { Typography, Stack, Avatar } from '@mui/material';
 import YellowButton from './buttons/YellowButton';
+import { useNavigate } from "react-router-dom";
+
 
 function AppMenu(props) {
-
+    const navigate = useNavigate();
     return (
         <Stack
             direction="column"
@@ -13,6 +15,7 @@ function AppMenu(props) {
             <YellowButton marginBottom='1em' width='90%' onClick={props.downloadFunc}>Download report as PDF</YellowButton>
             <YellowButton marginBottom='1em' width='90%'>Email PDF report</YellowButton>
             {props.children}
+            <YellowButton marginBottom='1em' width='90%' onClick={()=>navigate('/welcome')}>Back to homepage</YellowButton>
 
         </Stack>
     );

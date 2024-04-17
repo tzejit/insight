@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { HashLink as Link } from "react-router-hash-link";
 
 import Grid from "@mui/material/Grid";
@@ -15,7 +15,7 @@ import Analytics from "../components/Analytics";
 import theme from "../components/themes/MainTheme";
 import { do_sign_out, fetch_user_auth_status } from "../hooks/auth";
 import "./app.css";
-import { get_result } from "../hooks/dataManagement";
+import { get_result, get_raw_result } from "../hooks/dataManagement";
 import {
     list_jobs
 } from "../hooks/jobManagement";
@@ -26,6 +26,8 @@ function App() {
     const [username, setUsername] = useState("");
     const [userId, setUserId] = useState("");
     const [results, setResults] = useState("");
+    const [rawResults, setRawResults] = useState("");
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const handleDownloadPDF = () => {
         html2canvas(pdfRef.current).then((canvas) => {
@@ -65,9 +67,15 @@ function App() {
     useEffect(() => {
         async function fetchResult() {
             await pageLoadAuthVerification();
-            const latestJob = await list_jobs(userId);
-            let res = await get_result(latestJob[0].id)
+            let id = searchParams.get("id")
+            if (!id) {
+                const latestJob = await list_jobs(userId);
+                id = latestJob[0].id
+            }
+            let res = await get_result(id);
+            let rawres = await get_raw_result(id);
             setResults(JSON.parse(res));
+            setRawResults(JSON.parse(rawres));
         }
         fetchResult()
     }, []);
@@ -122,7 +130,7 @@ function App() {
                                 </Box>
 
                                 <ul>
-                                    <li>
+                                    {/* <li>
                                         <Link
                                             to="/dashboard#overview"
                                             className="black"
@@ -141,14 +149,14 @@ function App() {
                                                 Number of reviews per product
                                             </Typography>
                                         </Link>
-                                    </li>
+                                    </li> */}
                                     <li>
                                         <Link
-                                            to="/dashboard#sentimentperproduct"
+                                            to="/dashboard#kwsentiment"
                                             className="black"
                                         >
                                             <Typography>
-                                                Customer sentiment per product
+                                                Keyword sentiment
                                             </Typography>
                                         </Link>
                                     </li>
@@ -166,35 +174,35 @@ function App() {
                                 <ul>
                                     <li>
                                         <Link
-                                            to="/dashboard#positivereviews"
+                                            to="/dashboard#positivekw"
                                             className="black"
                                         >
                                             <Typography>
-                                                Top 5 positive reviews
+                                                Top 5 positive keywords
                                             </Typography>
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
-                                            to="/dashboard#negativereviews"
+                                            to="/dashboard#negativekw"
                                             className="black"
                                         >
                                             <Typography>
-                                                Top 5 negative reviews
+                                                Top 5 negative keywords
                                             </Typography>
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
-                                            to="/dashboard#sentimentovertime"
+                                            to="/dashboard#neutralkw"
                                             className="black"
                                         >
                                             <Typography>
-                                                Customer sentiment over time
+                                                Top 5 neutral keywords
                                             </Typography>
                                         </Link>
                                     </li>
-                                    <li>
+                                    {/* <li>
                                         <Link
                                             to="/dashboard#positiveevaluation"
                                             className="black"
@@ -237,9 +245,9 @@ function App() {
                                                 sentiment
                                             </Typography>
                                         </Link>
-                                    </li>
+                                    </li> */}
                                 </ul>
-                                <Box>
+                                {/* <Box>
                                     <Link
                                         to="/dashboard#recommendation"
                                         className="black"
@@ -248,12 +256,12 @@ function App() {
                                             Recommendation
                                         </Typography>
                                     </Link>
-                                </Box>
+                                </Box> */}
                             </Box>
                         </AppMenu>
                     </Grid>
                     <Grid item xs={9}>
-                        <Analytics refProp={pdfRef} data={results}/>
+                        <Analytics refProp={pdfRef} data={results} rawData={rawResults}/>
                     </Grid>
                 </Grid>
             </Box>

@@ -44,20 +44,20 @@ function Detailed({ data }) {
             <Stack
             direction="column"
             spacing={2} container boxSizing='border-box' width='inherit'>
-                    <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginRight='0.5em' id="positivereviews">
-                        <GraphTitle variant='subtitle1'>Top 5 most positive rated products</GraphTitle>
+                    <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginRight='0.5em' id="positivekw">
+                        <GraphTitle variant='subtitle1'>Top 5 most positive keywords</GraphTitle>
                         <BarGraph data={prepData(data, -1)}/>
                     </Box>
-                    <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginLeft='0.5em' id="negativereviews">
-                        <GraphTitle variant='subtitle1'>Top 5 most negative rated products</GraphTitle>
+                    <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginLeft='0.5em' id="negativekw">
+                        <GraphTitle variant='subtitle1'>Top 5 most negative keywords</GraphTitle>
                         <BarGraph data={prepData(data, 1)}/>
                     </Box>
-                    <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginLeft='0.5em' id="negativereviews">
-                        <GraphTitle variant='subtitle1'>Top 5 neutral rated products</GraphTitle>
+                    <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginLeft='0.5em' id="neutralkw">
+                        <GraphTitle variant='subtitle1'>Top 5 neutral keywords</GraphTitle>
                         <BarGraph data={prepData(data, 0)}/>
                     </Box>
             </Stack>
-            <Box bgcolor="yellow.main" padding='0 0.5em' borderRadius='0.5em' display='flex' alignItems='center' justifyContent='space-between'>
+            {/* <Box bgcolor="yellow.main" padding='0 0.5em' borderRadius='0.5em' display='flex' alignItems='center' justifyContent='space-between'>
                 <Typography variant='body1' fontWeight='fontWeightMedium'>Select product for in-depth sentiment analysis</Typography>
                 <Select size="small" sx={{
                     boxShadow: "none",
@@ -113,7 +113,7 @@ function Detailed({ data }) {
                     </Box>
 
                 </Grid>
-            </Grid>
+            </Grid> */}
         </Stack>
     );
 }

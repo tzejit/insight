@@ -5,14 +5,14 @@ import Detailed from './Detailed';
 import Recommendations from './Recommendations';
 
 
-function Analytics({ refProp, data }) {
+function Analytics({ refProp, data, rawData }) {
     return (
         <Stack ref={refProp}
             direction="column"
             spacing={2}>
-            <Overview />
-            <Detailed data={data} />
-            <Recommendations />
+            <Overview data={rawData}/>
+            <Detailed data={data}/>
+            {/* <Recommendations /> */}
             <Box />
         </Stack>
     );

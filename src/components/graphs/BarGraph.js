@@ -2,7 +2,6 @@ import React from "react";
 import {
     BarChart,
     Bar,
-    Cell,
     XAxis,
     Tooltip,
     ResponsiveContainer,
@@ -44,11 +43,19 @@ function CustomTooltip({ active, payload, label }) {
     return null;
 };
 
-const yAxis = document.getElementsByClassName('recharts-cartesian-axis recharts-yAxis')[0];
-const yAxisWidth = (yAxis)?.getBBox().width;
+function getWidth() {
+    const yAxesWidth = document.getElementsByClassName('recharts-cartesian-axis recharts-yAxis');
+    let yAxisWidth = 10;
+    for (var i = 1; i < yAxesWidth.length; i++) {
+        let ywidth = (yAxesWidth[i])?.getBBox().width??0
+        yAxisWidth = yAxisWidth > ywidth ? yAxisWidth : ywidth;
+    }
+    return yAxisWidth
+}
+
+
 
 function BarGraph({ data }) {
-    console.log(data)
     if (data === undefined) {
         return "loading"
     }
@@ -56,12 +63,11 @@ function BarGraph({ data }) {
         <ResponsiveContainer height={300} width="100%">
             <BarChart data={data} layout="vertical" >
                 <XAxis type="number"/>
-                <YAxis type="category" dataKey="name" width={yAxisWidth}/>
+                <YAxis type="category" dataKey="name" width={getWidth()}/>
                 <Tooltip content={<CustomTooltip/>}
                 wrapperStyle={{ backgroundColor: "white", borderStyle: "ridge", paddingLeft: "10px", paddingRight: "10px" }} />
                 <Bar dataKey="frequency" fill="#252f3f">
                     <LabelList content={<CustomLabel />} valueAccessor={valueAccessor("frequency")} />
-                    {data.map((_, index) => { return <Cell key={index} fill="#252f3f" />; })}
                 </Bar>
             </BarChart>
         </ResponsiveContainer>
