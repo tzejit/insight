@@ -32,7 +32,7 @@ function StackedBarGraph({ data }) {
     }
     return (
         <ResponsiveContainer height={300} width="100%">
-            <BarChart data={data}>
+            <BarChart data={data}  margin={{ top: 20 }}>
                 <XAxis dataKey="topic" />
                 <YAxis/>
                 <Tooltip />
