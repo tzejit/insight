@@ -13,7 +13,7 @@ function TextFieldYellow(props) {
                 "& .MuiOutlinedInput-root": {
                     backgroundColor: "yellow.secondary",
                     "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "yellow.secondary",
+                        borderColor: "black",
                     },
                 },
             }}
