@@ -18,16 +18,12 @@ import BlackButton from "../components/buttons/BlackButton";
 import TextFieldYellow from "../components/inputs/TextFieldYellow";
 import {
     submit_job,
-    get_job,
     start_job_polling,
-    list_jobs,
 } from "../hooks/jobManagement";
 import {
     upload_file,
-    get_result,
-    get_result_url,
 } from "../hooks/dataManagement";
-import { fetch_auth, fetch_user_auth_status, do_sign_out } from "../hooks/auth";
+import { fetch_user_auth_status, do_sign_out } from "../hooks/auth";
 
 function Welcome() {
     // const [authed, payload, uuid] = useAuth();
@@ -85,7 +81,7 @@ function Welcome() {
             // Create a callback for the job status subscription later on
             // TODO: (medium) Change this to show the user the status of the job
             const job_progress_callback = (data) => {
-                if (data == "COMPLETED" || data == "FAILED") {
+                if (data === "COMPLETED" || data === "FAILED") {
                     setLoading(false);
                     setSuccess(true);
                 }

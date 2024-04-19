@@ -69,7 +69,7 @@ function BarGraph({ data, fill }) {
     return (
         <ResponsiveContainer height={300} width="100%" >
             <BarChart data={data} layout="vertical">
-                <XAxis type="number"/>
+                <XAxis type="number" padding={{ right: 30 }} />
                 <YAxis type="category" dataKey="name" width={width}/>
                 <Tooltip content={<CustomTooltip/>}
                 wrapperStyle={{ backgroundColor: "white", borderStyle: "ridge", paddingLeft: "10px", paddingRight: "10px" }} />
