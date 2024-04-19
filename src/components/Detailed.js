@@ -46,15 +46,15 @@ function Detailed({ data }) {
             spacing={2} container boxSizing='border-box' width='inherit'>
                     <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginRight='0.5em' id="positivekw">
                         <GraphTitle variant='subtitle1'>Top 5 most positive keywords</GraphTitle>
-                        <BarGraph data={prepData(data, -1)}/>
+                        <BarGraph data={prepData(data, -1)} fill='#b8d8be'/>
                     </Box>
                     <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginLeft='0.5em' id="negativekw">
                         <GraphTitle variant='subtitle1'>Top 5 most negative keywords</GraphTitle>
-                        <BarGraph data={prepData(data, 1)}/>
+                        <BarGraph data={prepData(data, 1)} fill='#FAA0A0'/>
                     </Box>
                     <Box bgcolor="yellow.light" padding='0.2em' borderRadius='0.5em' marginLeft='0.5em' id="neutralkw">
                         <GraphTitle variant='subtitle1'>Top 5 neutral keywords</GraphTitle>
-                        <BarGraph data={prepData(data, 0)}/>
+                        <BarGraph data={prepData(data, 0)} fill='#252f3f'/>
                     </Box>
             </Stack>
             {/* <Box bgcolor="yellow.main" padding='0 0.5em' borderRadius='0.5em' display='flex' alignItems='center' justifyContent='space-between'>

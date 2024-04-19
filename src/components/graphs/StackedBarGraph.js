@@ -6,7 +6,8 @@ import {
     Tooltip,
     ResponsiveContainer,
     YAxis,
-    LabelList
+    LabelList,
+    Legend
 } from "recharts";
 
 
@@ -36,6 +37,7 @@ function StackedBarGraph({ data }) {
                 <XAxis dataKey="topic" />
                 <YAxis/>
                 <Tooltip />
+                <Legend />
                 <Bar dataKey="negative" stackId="a" fill="#FAA0A0"/>
                 <Bar dataKey="neutral"  stackId="a" fill="#252f3f"/>
                 <Bar dataKey="positive" stackId="a" fill="#b8d8be">

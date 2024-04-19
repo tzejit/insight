@@ -55,7 +55,7 @@ function getWidth() {
 
 
 
-function BarGraph({ data }) {
+function BarGraph({ data, fill }) {
     const [width, setWidth] = useState(1)
 
     useEffect(() => {
@@ -73,7 +73,7 @@ function BarGraph({ data }) {
                 <YAxis type="category" dataKey="name" width={width}/>
                 <Tooltip content={<CustomTooltip/>}
                 wrapperStyle={{ backgroundColor: "white", borderStyle: "ridge", paddingLeft: "10px", paddingRight: "10px" }} />
-                <Bar dataKey="frequency" fill="#252f3f">
+                <Bar dataKey="frequency" fill={fill}>
                     <LabelList content={<CustomLabel />} valueAccessor={valueAccessor("frequency")} />
                 </Bar>
             </BarChart>

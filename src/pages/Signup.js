@@ -80,7 +80,7 @@ function Signup() {
             {showOTPVerification ? (
                 <Box
                     sx={{
-                        backgroundColor: "yellow.main",
+                        backgroundColor: "yellow.secondary",
                         flexDirection: "column",
                     }}
                     height="100vh"
@@ -125,7 +125,7 @@ function Signup() {
             ) : (
                 <Box
                     sx={{
-                        backgroundColor: "yellow.main",
+                        backgroundColor: "yellow.secondary",
                         flexDirection: "column",
                     }}
                     height="100vh"

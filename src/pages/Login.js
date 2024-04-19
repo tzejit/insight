@@ -62,7 +62,7 @@ function Login() {
     return (
         <ThemeProvider theme={theme}>
             <Box
-                sx={{ backgroundColor: "yellow.main", flexDirection: "column" }}
+                sx={{ backgroundColor: "yellow.secondary", flexDirection: "column" }}
                 height="100vh"
                 width="100vw"
                 display="flex"

@@ -13,6 +13,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import "./landing.css";
 import theme from "../components/themes/MainTheme";
 import YellowButton from "../components/buttons/YellowButton";
+import BlackButton from "../components/buttons/BlackButton";
+
 import TextFieldYellow from "../components/inputs/TextFieldYellow";
 import {
     submit_job,
@@ -133,13 +135,14 @@ function Welcome() {
                 height="100vh"
                 padding="1em"
                 spacing={1}
+                backgroundColor="blue.main"
             >
                 <Grid item xs={6} height="100%">
                     <Stack
                         justifyContent="center"
                         alignItems="center"
                         sx={{
-                            backgroundColor: "yellow.main",
+                            backgroundColor: "yellow.secondary",
                             borderRadius: "1em",
                         }}
                         height="100%"
@@ -172,12 +175,13 @@ function Welcome() {
                         >
                             Subscription: Premium
                         </Typography>
-                        <YellowButton marginBottom="1em" width="20rem">
+                        <BlackButton marginBottom="1em" width="20rem">
                             View or edit profile
-                        </YellowButton>
-                        <YellowButton marginBottom="1em" width="20rem">
+                        </BlackButton>
+                        <br/>
+                        <BlackButton marginBottom="1em" width="20rem">
                             View or edit Subscription details
-                        </YellowButton>
+                        </BlackButton>
                     </Stack>
                 </Grid>
                 <Grid item xs={6} height="100%">
@@ -185,7 +189,7 @@ function Welcome() {
                         justifyContent="space-evenly"
                         alignItems="center"
                         sx={{
-                            backgroundColor: "yellow.main",
+                            backgroundColor: "yellow.secondary",
                             borderRadius: "1em",
                         }}
                         height="100%"
@@ -333,9 +337,9 @@ function Welcome() {
                                 </Box>
                             </Box>
                         </Box>
-                        <YellowButton width="70%" onClick={() => logout()}>
+                        <BlackButton width="70%" onClick={() => logout()}>
                             Logout
-                        </YellowButton>
+                        </BlackButton>
                     </Stack>
                 </Grid>
             </Grid>
