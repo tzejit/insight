@@ -1,6 +1,6 @@
-# Insight Frontend
+# InSight Frontend
 
-Simple React frontend
+React frontend for our CS5224 project, InSight. Hosted using AWS Amplify.
 
 ## Setup
 
@@ -15,7 +15,7 @@ npm install
 For development, make sure your working directory is the main directory.
 
 ```bash
-npm start
+npm run start
 ```
 
 ## Workflow:
