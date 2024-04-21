@@ -13,19 +13,17 @@ import CircularProgress from '@mui/material/CircularProgress';
 import "./landing.css";
 import theme from "../components/themes/MainTheme";
 import YellowButton from "../components/buttons/YellowButton";
+import BlackButton from "../components/buttons/BlackButton";
+
 import TextFieldYellow from "../components/inputs/TextFieldYellow";
 import {
     submit_job,
-    get_job,
     start_job_polling,
-    list_jobs,
 } from "../hooks/jobManagement";
 import {
     upload_file,
-    get_result,
-    get_result_url,
 } from "../hooks/dataManagement";
-import { fetch_auth, fetch_user_auth_status, do_sign_out } from "../hooks/auth";
+import { fetch_user_auth_status, do_sign_out } from "../hooks/auth";
 
 function Welcome() {
     // const [authed, payload, uuid] = useAuth();
@@ -83,7 +81,7 @@ function Welcome() {
             // Create a callback for the job status subscription later on
             // TODO: (medium) Change this to show the user the status of the job
             const job_progress_callback = (data) => {
-                if (data == "COMPLETED" || data == "FAILED") {
+                if (data === "COMPLETED" || data === "FAILED") {
                     setLoading(false);
                     setSuccess(true);
                 }
@@ -133,13 +131,14 @@ function Welcome() {
                 height="100vh"
                 padding="1em"
                 spacing={1}
+                backgroundColor="blue.main"
             >
                 <Grid item xs={6} height="100%">
                     <Stack
                         justifyContent="center"
                         alignItems="center"
                         sx={{
-                            backgroundColor: "yellow.main",
+                            backgroundColor: "yellow.secondary",
                             borderRadius: "1em",
                         }}
                         height="100%"
@@ -172,12 +171,13 @@ function Welcome() {
                         >
                             Subscription: Premium
                         </Typography>
-                        <YellowButton marginBottom="1em" width="20rem">
+                        <BlackButton marginBottom="1em" width="20rem">
                             View or edit profile
-                        </YellowButton>
-                        <YellowButton marginBottom="1em" width="20rem">
+                        </BlackButton>
+                        <br/>
+                        <BlackButton marginBottom="1em" width="20rem">
                             View or edit Subscription details
-                        </YellowButton>
+                        </BlackButton>
                     </Stack>
                 </Grid>
                 <Grid item xs={6} height="100%">
@@ -185,7 +185,7 @@ function Welcome() {
                         justifyContent="space-evenly"
                         alignItems="center"
                         sx={{
-                            backgroundColor: "yellow.main",
+                            backgroundColor: "yellow.secondary",
                             borderRadius: "1em",
                         }}
                         height="100%"
@@ -333,9 +333,9 @@ function Welcome() {
                                 </Box>
                             </Box>
                         </Box>
-                        <YellowButton width="70%" onClick={() => logout()}>
+                        <BlackButton width="70%" onClick={() => logout()}>
                             Logout
-                        </YellowButton>
+                        </BlackButton>
                     </Stack>
                 </Grid>
             </Grid>

@@ -14,7 +14,7 @@ function Landing() {
     return (
         <ThemeProvider theme={theme}>
             <Box
-                sx={{ backgroundColor: "yellow.main" }}
+                sx={{ backgroundColor: "yellow.secondary" }}
                 height="100vh"
                 width="100vw"
                 display="flex"

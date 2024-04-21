@@ -13,21 +13,21 @@ function Overview({data}) {
         let acc = {}
         data.forEach(e=> {
             if (!(e.topic in  acc)) {
-                acc[e.topic] = {}
+                acc[e.topic] = {neutral:0, positive:0, negative: 0}
             }
             if(e.sentiment === 0) {
-                acc[e.topic]['neutral'] = acc[e.topic]['neutral']??0 + e.frequency
+                acc[e.topic]['neutral'] += e.frequency
             } else if (e.sentiment > 0) {
-                acc[e.topic]['positive'] = acc[e.topic]['positive']??0 + e.frequency
+                acc[e.topic]['positive'] += e.frequency
             } else {
-                acc[e.topic]['negative'] = acc[e.topic]['negative']??0 + e.frequency
+                acc[e.topic]['negative'] += e.frequency
             }
         })
 
 
         let sortable = []
         for (let topic in acc) {
-            sortable.push({topic: topic, neutral: acc[topic]['neutral']??0, positive: acc[topic]['positive']??0, negative: acc[topic]['negative']??0})
+            sortable.push({topic: topic, neutral: acc[topic]['neutral'], positive: acc[topic]['positive'], negative: acc[topic]['negative']})
         }
 
         sortable.sort((a, b) => b.neutral + b.positive + b.negative - (a.neutral + a.positive + a.negative));

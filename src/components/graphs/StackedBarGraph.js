@@ -6,7 +6,8 @@ import {
     Tooltip,
     ResponsiveContainer,
     YAxis,
-    LabelList
+    LabelList,
+    Legend
 } from "recharts";
 
 
@@ -32,13 +33,14 @@ function StackedBarGraph({ data }) {
     }
     return (
         <ResponsiveContainer height={300} width="100%">
-            <BarChart data={data}>
+            <BarChart data={data}  margin={{ top: 20 }}>
                 <XAxis dataKey="topic" />
                 <YAxis/>
                 <Tooltip />
-                <Bar dataKey="negative" stackId="a" fill="#FAA0A0"/>
-                <Bar dataKey="neutral"  stackId="a" fill="#252f3f"/>
-                <Bar dataKey="positive" stackId="a" fill="#b8d8be">
+                <Legend />
+                <Bar dataKey="negative" stackId="a" fill="#020D28"/>
+                <Bar dataKey="neutral"  stackId="a" fill="#A7A5A5"/>
+                <Bar dataKey="positive" stackId="a" fill="#5FA2E0">
                 <LabelList content={<CustomLabel />} valueAccessor={valueAccessor()} />
                 </Bar>
             </BarChart>

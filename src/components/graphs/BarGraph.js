@@ -1,4 +1,3 @@
-import React from "react";
 import {
     BarChart,
     Bar,
@@ -8,6 +7,7 @@ import {
     YAxis,
     LabelList
 } from "recharts";
+import { useEffect, useState, useRef } from "react";
 
 
 const valueAccessor = attribute => ({ payload }) => {
@@ -55,18 +55,25 @@ function getWidth() {
 
 
 
-function BarGraph({ data }) {
+function BarGraph({ data, fill }) {
+    const [width, setWidth] = useState(1)
+
+    useEffect(() => {
+
+        setWidth(getWidth())
+    }, [data]);
+
     if (data === undefined) {
         return "loading"
     }
     return (
-        <ResponsiveContainer height={300} width="100%">
-            <BarChart data={data} layout="vertical" >
-                <XAxis type="number"/>
-                <YAxis type="category" dataKey="name" width={getWidth()}/>
+        <ResponsiveContainer height={300} width="100%" >
+            <BarChart data={data} layout="vertical">
+                <XAxis type="number" padding={{ right: 30 }} />
+                <YAxis type="category" dataKey="name" width={width}/>
                 <Tooltip content={<CustomTooltip/>}
                 wrapperStyle={{ backgroundColor: "white", borderStyle: "ridge", paddingLeft: "10px", paddingRight: "10px" }} />
-                <Bar dataKey="frequency" fill="#252f3f">
+                <Bar dataKey="frequency" fill={fill}>
                     <LabelList content={<CustomLabel />} valueAccessor={valueAccessor("frequency")} />
                 </Bar>
             </BarChart>
