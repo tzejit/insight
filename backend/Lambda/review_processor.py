@@ -121,7 +121,6 @@ class ReviewProcessor:
         output_df = pd.DataFrame()
         output_df["frequency"] = raw_df.groupby("topic")["frequency"].sum()
         output_df["sentiment"] = raw_df.groupby("topic")["sentiment"].mean()
-        output_df = output_df.reset_index()  # return topic to being a normal column
 
         # return both dfs
         return output_df, raw_df
