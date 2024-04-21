@@ -4,17 +4,22 @@ import Grid from "@mui/material/Grid";
 import { ThemeProvider } from "@mui/material/styles";
 import { Typography, Box } from "@mui/material";
 import Stack from "@mui/material/Stack";
+import CssBaseline from "@mui/material/CssBaseline";
 
-import InsightTitle from "../components/typography/InsightTitle";
+import {
+    InsightTitleFontFamily,
+    InsightTitle,
+} from "../components/typography/InsightTitle";
 import BlackButton from "../components/buttons/BlackButton";
 import theme from "../components/themes/MainTheme";
+import logo from "../assets/InSight Logo_edited_color.webp";
 import "./landing.css";
 
 function Landing() {
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Box
-                sx={{ backgroundColor: "yellow.secondary" }}
                 height="100vh"
                 width="100vw"
                 display="flex"
@@ -22,23 +27,30 @@ function Landing() {
                 alignItems="center"
             >
                 <Stack justifyContent="center" alignItems="center">
+                    <img src={logo} width="250"></img>
                     <Typography
                         color="black"
-                        variant="h3"
-                        fontWeight="fontWeightMedium"
-                        margin="1rem"
+                        variant="h4"
+                        sx={{ opacity: "50%" }}
+                        fontWeight="200"
+                        fontStyle="italic"
+                        fontFamily={InsightTitleFontFamily}
+                        margin="0.5rem"
                     >
                         Ready
                     </Typography>
                     <Typography
                         color="black"
                         variant="h3"
-                        fontWeight="fontWeightMedium"
-                        margin="1rem"
+                        sx={{ opacity: "75%" }}
+                        fontWeight="300"
+                        fontStyle="italic"
+                        fontFamily={InsightTitleFontFamily}
+                        margin="0.5rem"
                     >
                         Set
                     </Typography>
-                    <InsightTitle />
+                    <InsightTitle is_animated />
 
                     <Grid
                         container

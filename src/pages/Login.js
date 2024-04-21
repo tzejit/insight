@@ -3,13 +3,16 @@ import { useNavigate } from "react-router-dom";
 
 import { ThemeProvider } from "@mui/material/styles";
 import { Typography } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
+import CssBaseline from "@mui/material/CssBaseline";
+import Paper from "@mui/material/Paper";
 
 import { signIn } from "aws-amplify/auth";
 
-import InsightTitle from "../components/typography/InsightTitle";
+import { InsightTitle } from "../components/typography/InsightTitle";
 import BlackButton from "../components/buttons/BlackButton";
 import TextFieldYellow from "../components/inputs/TextFieldYellow";
 import theme from "../components/themes/MainTheme";
@@ -19,10 +22,12 @@ function Login() {
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showProgress, setShowProgress] = useState("");
     const [error, setError] = useState("");
 
     async function loginApiCall() {
         try {
+            setShowProgress(true);
             console.info("Attempting login");
             const { isSignedIn, nextStep } = await signIn({
                 username,
@@ -43,8 +48,10 @@ function Login() {
             }
             setUsername("");
             setPassword("");
+            setShowProgress(false);
             navigate("/welcome");
         } catch (error) {
+            setShowProgress(false);
             if (error.name === "UserAlreadyAuthenticatedException") {
                 console.warn(
                     "There is already a user logged in - logging them out now"
@@ -61,46 +68,55 @@ function Login() {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Box
-                sx={{ backgroundColor: "yellow.secondary", flexDirection: "column" }}
+                sx={{
+                    flexDirection: "column",
+                }}
                 height="100vh"
                 width="100vw"
                 display="flex"
                 justifyContent="space-evenly"
                 alignItems="center"
             >
-                <InsightTitle />
-                <Stack justifyContent="center" alignItems="center" spacing={2}>
-                    <Box width="100%">
-                        <Typography
-                            color="black"
-                            variant="body1"
-                            fontWeight="fontWeightMedium"
-                            align="left"
-                        >
-                            Username
-                        </Typography>
-                    </Box>
-                    <TextFieldYellow
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                    <Box width="100%">
-                        <Typography
-                            color="black"
-                            variant="body1"
-                            fontWeight="fontWeightMedium"
-                            align="left"
-                        >
-                            Password
-                        </Typography>
-                    </Box>
-                    <TextFieldYellow
-                        onChange={(e) => setPassword(e.target.value)}
-                        type="password"
-                    />
-                    {error ? <Alert severity="error">{error}</Alert> : ""}
-                </Stack>
-                <BlackButton onClick={loginApiCall}>Login</BlackButton>
+                <Paper
+                    sx={{
+                        padding: "2em 5em 2em 5em",
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                    }}
+                    elevation="6"
+                >
+                    <InsightTitle />
+                    <Stack
+                        sx={{
+                            marginTop: "2em",
+                            marginBottom: "2em",
+                        }}
+                        justifyContent="center"
+                        alignItems="center"
+                        spacing={2}
+                    >
+                        <Typography>Log in with your email address.</Typography>
+                        <TextFieldYellow
+                            placeholder="Email"
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                        <TextFieldYellow
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Password"
+                            type="password"
+                        />
+                        {error ? <Alert severity="error">{error}</Alert> : ""}
+                    </Stack>
+                    {showProgress ? (
+                        <CircularProgress color="black" />
+                    ) : (
+                        <BlackButton onClick={loginApiCall}>Login</BlackButton>
+                    )}
+                </Paper>
             </Box>
         </ThemeProvider>
     );

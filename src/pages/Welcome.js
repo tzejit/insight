@@ -5,25 +5,23 @@ import Grid from "@mui/material/Grid";
 import { ThemeProvider } from "@mui/material/styles";
 import { Typography, Avatar, Box } from "@mui/material";
 import Stack from "@mui/material/Stack";
-import CircularProgress from '@mui/material/CircularProgress';
-
+import Paper from "@mui/material/Paper";
+import CircularProgress from "@mui/material/CircularProgress";
+import CssBaseline from "@mui/material/CssBaseline";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 // import { v4 as uuidv4 } from "uuid";
 
 import "./landing.css";
 import theme from "../components/themes/MainTheme";
-import YellowButton from "../components/buttons/YellowButton";
 import BlackButton from "../components/buttons/BlackButton";
+import { InsightTitle } from "../components/typography/InsightTitle";
 
 import TextFieldYellow from "../components/inputs/TextFieldYellow";
-import {
-    submit_job,
-    start_job_polling,
-} from "../hooks/jobManagement";
-import {
-    upload_file,
-} from "../hooks/dataManagement";
+import { submit_job, start_job_polling } from "../hooks/jobManagement";
+import { upload_file } from "../hooks/dataManagement";
 import { fetch_user_auth_status, do_sign_out } from "../hooks/auth";
+import { Cloud } from "@mui/icons-material";
 
 function Welcome() {
     // const [authed, payload, uuid] = useAuth();
@@ -66,18 +64,18 @@ function Welcome() {
         const fileId = fileName; // with or without .csv (doesn't matter)
         const file = inputRef.current.files[0];
         // TODO: (low) Verify that file uploaded is a CSV
-        if (productName === '') {
-            setError('Product name is empty');
-            return
+        if (productName === "") {
+            setError("Product name is empty");
+            return;
         }
-        setError('');
+        setError("");
 
         try {
             // File upload does NOT automatically trigger a processing job
             // Refer to submit_job below
             setLoading(true);
             await upload_file(fileId, file);
-            
+
             // Create a callback for the job status subscription later on
             // TODO: (medium) Change this to show the user the status of the job
             const job_progress_callback = (data) => {
@@ -124,37 +122,32 @@ function Welcome() {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Grid
                 container
                 justifyContent="center"
                 alignItems="center"
                 height="100vh"
-                padding="1em"
+                width="80vw"
+                margin="auto auto auto auto"
                 spacing={1}
-                backgroundColor="blue.main"
             >
                 <Grid item xs={6} height="100%">
                     <Stack
                         justifyContent="center"
                         alignItems="center"
                         sx={{
-                            backgroundColor: "yellow.secondary",
                             borderRadius: "1em",
                         }}
                         height="100%"
                     >
-                        <Typography
-                            variant="h5"
-                            fontWeight="fontWeightMedium"
-                            marginBottom="1em"
-                        >
-                            Welcome to InSight!
-                        </Typography>
+                        <InsightTitle />
                         <Avatar
                             sx={{
                                 width: "6em",
                                 height: "6em",
                                 marginBottom: "1em",
+                                marginTop: "1em",
                             }}
                         />
                         <Typography
@@ -171,44 +164,37 @@ function Welcome() {
                         >
                             Subscription: Premium
                         </Typography>
-                        <BlackButton marginBottom="1em" width="20rem">
+                        <BlackButton margin="1em" width="20rem">
                             View or edit profile
                         </BlackButton>
-                        <br/>
-                        <BlackButton marginBottom="1em" width="20rem">
-                            View or edit Subscription details
+                        <br />
+                        <BlackButton margin="1em" width="20rem">
+                            View or edit subscription details
+                        </BlackButton>
+                        <BlackButton
+                            margin="1em"
+                            width="20rem"
+                            onClick={() => logout()}
+                        >
+                            Logout
                         </BlackButton>
                     </Stack>
                 </Grid>
                 <Grid item xs={6} height="100%">
                     <Stack
-                        justifyContent="space-evenly"
+                        justifyContent="center"
                         alignItems="center"
-                        sx={{
-                            backgroundColor: "yellow.secondary",
-                            borderRadius: "1em",
-                        }}
+                        gap="1em"
                         height="100%"
+                        display="flex"
                     >
-                        <Box
-                            width="70%"
-                            justifyContent="center"
-                            alignItems="center"
-                        >
-                            <Avatar
-                                sx={{
-                                    width: "3em",
-                                    height: "3em",
-                                    margin: "0 auto -1.5em auto",
-                                }}
-                            />
+                        <Paper elevation="6" sx={{ width: "60%" }}>
                             <Box
-                                backgroundColor="blue.main"
                                 justifyContent="center"
                                 alignItems="center"
                                 padding="2.5em 1em"
-                                borderRadius="1em"
-                                boxSizing="border-box"
+                                // borderRadius="1em"
+                                // boxSizing="border-box"
                                 display="flex"
                                 flexDirection="column"
                                 onDrop={(e) => handle_drop(e)}
@@ -227,7 +213,6 @@ function Welcome() {
                                     variant="h5"
                                     fontWeight="fontWeightMedium"
                                     marginBottom="1em"
-                                    color="white"
                                     align="center"
                                 >
                                     Start a new InSight report
@@ -236,13 +221,12 @@ function Welcome() {
                                     variant="body1"
                                     fontWeight="fontWeightLight"
                                     marginBottom="1em"
-                                    color="white"
                                     align="center"
                                 >
                                     <i>
                                         {fileName
                                             ? fileName
-                                            : "To start a new report, upload your files by dragging and dropping into this area or clicking the button below"}
+                                            : "To start a new report, upload your files by dragging and dropping into this area or clicking the button below."}
                                     </i>
                                 </Typography>
                                 {fileName ? (
@@ -255,32 +239,56 @@ function Welcome() {
                                 ) : (
                                     ""
                                 )}
-                                {error ? <Alert severity="error">{error}</Alert> : ""}
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <YellowButton
+                                {error ? (
+                                    <Alert severity="error">{error}</Alert>
+                                ) : (
+                                    ""
+                                )}
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <BlackButton
                                         onClick={() => inputRef.current.click()}
-                                        padding="auto"
                                     >
-                                        Upload
-                                    </YellowButton>
+                                        <span
+                                            style={{ display: "inline-flex" }}
+                                        >
+                                            <CloudUploadIcon
+                                                sx={{ marginRight: "0.25em" }}
+                                            />{" "}
+                                            Upload file
+                                        </span>
+                                    </BlackButton>
                                     {fileName ? (
-                                        <Box sx={{ m: 1, position: 'relative' }}>
-                                            <YellowButton
-                                                onClick={success ? () => navigate('/dashboard') : handle_upload}
+                                        <Box
+                                            sx={{ m: 1, position: "relative" }}
+                                        >
+                                            <BlackButton
+                                                onClick={
+                                                    success
+                                                        ? () =>
+                                                              navigate(
+                                                                  "/dashboard"
+                                                              )
+                                                        : handle_upload
+                                                }
                                                 padding="auto"
                                                 disabled={loading}
                                             >
-                                                {success ? 'View' : 'Submit'}
-                                            </YellowButton>
+                                                {success ? "View" : "Submit"}
+                                            </BlackButton>
                                             {loading && (
                                                 <CircularProgress
                                                     size={24}
                                                     sx={{
-                                                        position: 'absolute',
-                                                        top: '50%',
-                                                        left: '50%',
-                                                        marginTop: '-12px',
-                                                        marginLeft: '-12px',
+                                                        position: "absolute",
+                                                        top: "50%",
+                                                        left: "50%",
+                                                        marginTop: "-12px",
+                                                        marginLeft: "-12px",
                                                     }}
                                                 />
                                             )}
@@ -288,24 +296,11 @@ function Welcome() {
                                     ) : (
                                         ""
                                     )}
-
                                 </Box>
                             </Box>
-                        </Box>
-                        <Box
-                            width="70%"
-                            justifyContent="center"
-                            alignItems="center"
-                        >
-                            <Avatar
-                                sx={{
-                                    width: "3em",
-                                    height: "3em",
-                                    margin: "0 auto -1.5em auto",
-                                }}
-                            />
+                        </Paper>
+                        <Paper elevation="6" sx={{ width: "60%" }}>
                             <Box
-                                backgroundColor="blue.main"
                                 justifyContent="center"
                                 alignItems="center"
                                 padding="2.5em 1em"
@@ -318,24 +313,29 @@ function Welcome() {
                                     variant="h5"
                                     fontWeight="fontWeightMedium"
                                     marginBottom="1em"
-                                    color="white"
                                     align="center"
                                 >
                                     View a historic InSight report
                                 </Typography>
-                                <Box>
-                                    <YellowButton
-                                        onClick={() => navigate("/history")}
-                                        padding="auto"
-                                    >
-                                        View history
-                                    </YellowButton>
-                                </Box>
+                                <Typography
+                                    variant="body1"
+                                    fontWeight="fontWeightLight"
+                                    marginBottom="1em"
+                                    align="center"
+                                >
+                                    <i>
+                                        You can access all past reports and
+                                        download them from here.
+                                    </i>
+                                </Typography>
+                                <BlackButton
+                                    onClick={() => navigate("/history")}
+                                    padding="auto"
+                                >
+                                    View history
+                                </BlackButton>
                             </Box>
-                        </Box>
-                        <BlackButton width="70%" onClick={() => logout()}>
-                            Logout
-                        </BlackButton>
+                        </Paper>
                     </Stack>
                 </Grid>
             </Grid>

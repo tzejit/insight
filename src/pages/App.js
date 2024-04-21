@@ -6,6 +6,7 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import { ThemeProvider } from "@mui/material/styles";
 import { Typography } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
 
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -16,9 +17,7 @@ import theme from "../components/themes/MainTheme";
 import { do_sign_out, fetch_user_auth_status } from "../hooks/auth";
 import "./app.css";
 import { get_result, get_raw_result } from "../hooks/dataManagement";
-import {
-    list_jobs
-} from "../hooks/jobManagement";
+import { list_jobs } from "../hooks/jobManagement";
 
 function App() {
     const pdfRef = useRef(null);
@@ -67,17 +66,17 @@ function App() {
     useEffect(() => {
         async function fetchResult() {
             await pageLoadAuthVerification();
-            let id = searchParams.get("id")
+            let id = searchParams.get("id");
             if (!id) {
                 const latestJob = await list_jobs(userId);
-                id = latestJob[0].id
+                id = latestJob[0].id;
             }
             let res = await get_result(id);
             let rawres = await get_raw_result(id);
             setResults(JSON.parse(res));
             setRawResults(JSON.parse(rawres));
         }
-        fetchResult()
+        fetchResult();
     }, []);
 
     const logout = async () => {
@@ -87,6 +86,7 @@ function App() {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Box>
                 <Grid container spacing={1} padding="2em 1em">
                     <Grid
@@ -105,7 +105,7 @@ function App() {
                         >
                             <Box
                                 height="inherit"
-                                backgroundColor="yellow.secondary"
+                                backgroundColor="secondary"
                                 alignItems="center"
                                 padding="0.5em 1em"
                                 borderRadius="0.5em"
@@ -130,34 +130,12 @@ function App() {
                                 </Box>
 
                                 <ul>
-                                    {/* <li>
-                                        <Link
-                                            to="/dashboard#overview"
-                                            className="black"
-                                        >
-                                            <Typography>
-                                                Data summary
-                                            </Typography>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            to="/dashboard#reviewperproduct"
-                                            className="black"
-                                        >
-                                            <Typography>
-                                                Number of reviews per product
-                                            </Typography>
-                                        </Link>
-                                    </li> */}
                                     <li>
                                         <Link
                                             to="/dashboard#kwsentiment"
                                             className="black"
                                         >
-                                            <Typography>
-                                                Keyword sentiment
-                                            </Typography>
+                                            Keyword sentiment
                                         </Link>
                                     </li>
                                 </ul>
@@ -177,9 +155,7 @@ function App() {
                                             to="/dashboard#positivekw"
                                             className="black"
                                         >
-                                            <Typography>
-                                                Top 5 positive keywords
-                                            </Typography>
+                                            Top 5 positive keywords
                                         </Link>
                                     </li>
                                     <li>
@@ -187,9 +163,7 @@ function App() {
                                             to="/dashboard#negativekw"
                                             className="black"
                                         >
-                                            <Typography>
-                                                Top 5 negative keywords
-                                            </Typography>
+                                            Top 5 negative keywords
                                         </Link>
                                     </li>
                                     <li>
@@ -197,9 +171,7 @@ function App() {
                                             to="/dashboard#neutralkw"
                                             className="black"
                                         >
-                                            <Typography>
-                                                Top 5 neutral keywords
-                                            </Typography>
+                                            Top 5 neutral keywords
                                         </Link>
                                     </li>
                                     {/* <li>
@@ -261,7 +233,11 @@ function App() {
                         </AppMenu>
                     </Grid>
                     <Grid item xs={9}>
-                        <Analytics refProp={pdfRef} data={results} rawData={rawResults}/>
+                        <Analytics
+                            refProp={pdfRef}
+                            data={results}
+                            rawData={rawResults}
+                        />
                     </Grid>
                 </Grid>
             </Box>

@@ -5,22 +5,23 @@ import Grid from "@mui/material/Grid";
 import { ThemeProvider } from "@mui/material/styles";
 import { Typography, Box } from "@mui/material";
 import Stack from "@mui/material/Stack";
+import CssBaseline from "@mui/material/CssBaseline";
+import Paper from "@mui/material/Paper";
 
 import AppMenu from "../components/AppMenu";
-import theme from "../components/themes/MainTheme";
-import BlackButton from "../components/buttons/BlackButton";
 import AppTable from "../components/graphs/AppTable";
-import YellowButton from "../components/buttons/YellowButton";
-import { do_sign_out, fetch_user_auth_status } from "../hooks/auth";
+import BlackButton from "../components/buttons/BlackButton";
+import theme from "../components/themes/MainTheme";
+import { InsightTitle } from "../components/typography/InsightTitle";
+
 import "./landing.css";
-import {
-    get_job,
-    list_jobs,
-} from "../hooks/jobManagement";
+import { fetch_user_auth_status } from "../hooks/auth";
+import { get_job, list_jobs } from "../hooks/jobManagement";
 
 function History() {
     const navigate = useNavigate();
     const [jobList, setJobList] = useState(null);
+    const [username, setUsername] = useState(null);
 
     // RUN BEFORE PAGE LOADS
     useEffect(() => {
@@ -32,59 +33,58 @@ function History() {
                 navigate("/error");
             } else {
                 const userId = user_auth_status.userId;
+                setUsername(user_auth_status.username);
                 const jobs = await list_jobs(userId);
-                const tempJobList = []
-                for (let e in jobs){
+                const tempJobList = [];
+                for (let e in jobs) {
                     let job = await get_job(jobs[e].id);
-                    tempJobList.push({date: job.createdAt, title: job.job_name, file: job.file_id, name: job.job_config.product_name, id:jobs[e].id})
+                    tempJobList.push({
+                        date: job.createdAt,
+                        title: job.job_name,
+                        file: job.file_id,
+                        name: job.job_config.product_name,
+                        id: jobs[e].id,
+                    });
                 }
 
-                setJobList(tempJobList)
-            } 
+                setJobList(tempJobList);
+            }
         }
-        fetchHistory()
+        fetchHistory();
     }, []);
-
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Grid
                 container
                 justifyContent="center"
                 alignItems="center"
                 height="100vh"
-                padding="1em"
+                width="80vw"
+                paddingTop="5em"
+                marginLeft="auto"
+                marginRight="auto"
                 spacing={1}
             >
                 <Grid item xs={3} height="100%">
-                    <AppMenu>
-                        <YellowButton width="90%">Delete report</YellowButton>
-                        <Box height="0.5em"></Box>
+                    <InsightTitle />
+                    <AppMenu username={username}>
+                        <BlackButton width="90%">Delete report</BlackButton>
                         <BlackButton width="90%">
                             Generate new InSight report
                         </BlackButton>
                     </AppMenu>
                 </Grid>
-                <Grid item xs={9} height="100%">
+                <Grid item xs={9} height="80%">
                     <Stack alignItems="center" height="100%" spacing={2}>
-                        <Box
-                            width="100%"
-                            justifyContent="center"
-                            alignItems="center"
-                            sx={{
-                                backgroundColor: "grey.main",
-                                borderRadius: "0.5em",
-                                padding: "0.2em 0",
-                            }}
+                        <Typography
+                            variant="h5"
+                            fontWeight="fontWeightBold"
+                            align="center"
                         >
-                            <Typography
-                                variant="h5"
-                                fontWeight="fontWeightMedium"
-                                align="center"
-                            >
-                                Overview of past generated InSight reports
-                            </Typography>
-                        </Box>
+                            Overview of past generated InSight reports
+                        </Typography>
                         <Box
                             width="100%"
                             height="100%"
@@ -105,7 +105,7 @@ function History() {
                                 borderRadius="0.5em"
                                 boxSizing="border-box"
                             >
-                                <AppTable rows={jobList}/>
+                                <AppTable rows={jobList} />
                             </Box>
                         </Box>
                     </Stack>

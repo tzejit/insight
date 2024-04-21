@@ -5,10 +5,12 @@ import { ThemeProvider } from "@mui/material/styles";
 import { Box, Typography } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import Alert from "@mui/material/Alert";
+import CssBaseline from "@mui/material/CssBaseline";
+import Paper from "@mui/material/Paper";
 
 import { signUp, confirmSignUp } from "aws-amplify/auth";
 
-import InsightTitle from "../components/typography/InsightTitle";
+import { InsightTitle } from "../components/typography/InsightTitle";
 import TextFieldYellow from "../components/inputs/TextFieldYellow";
 import BlackButton from "../components/buttons/BlackButton";
 import theme from "../components/themes/MainTheme";
@@ -77,10 +79,10 @@ function Signup() {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             {showOTPVerification ? (
                 <Box
                     sx={{
-                        backgroundColor: "yellow.secondary",
                         flexDirection: "column",
                     }}
                     height="100vh"
@@ -89,43 +91,61 @@ function Signup() {
                     justifyContent="space-evenly"
                     alignItems="center"
                 >
-                    <InsightTitle />
-                    <Stack
-                        justifyContent="center"
-                        alignItems="center"
-                        spacing={2}
-                    >
-                        <Box width="100%">
-                            <Typography
-                                color="black"
-                                variant="body1"
-                                fontWeight="fontWeightMedium"
-                                align="left"
-                            >
-                                Enter verification code sent to {username}
-                            </Typography>
-                        </Box>
-                        <TextFieldYellow
-                            id="otpTextField"
-                            placeholder="Enter OTP"
-                            onChange={(e) =>
-                                setConfirmationCode(e.target.value)
-                            }
-                        />
-                        {error ? <Alert severity="error">{error}</Alert> : ""}
-                    </Stack>
-                    <BlackButton
-                        onClick={async () => {
-                            await handleSignUpConfirmation();
+                    <Paper
+                        sx={{
+                            padding: "2em 5em 2em 5em",
+                            display: "flex",
+                            alignItems: "center",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
                         }}
+                        elevation="6"
                     >
-                        Verify
-                    </BlackButton>
+                        <InsightTitle />
+                        <Stack
+                            justifyContent="center"
+                            alignItems="center"
+                            spacing={2}
+                            sx={{
+                                marginTop: "2em",
+                                marginBottom: "2em",
+                            }}
+                        >
+                            <Box width="100%">
+                                <Typography
+                                    color="black"
+                                    variant="body1"
+                                    fontWeight="fontWeightMedium"
+                                    align="left"
+                                >
+                                    Enter verification code sent to {username}
+                                </Typography>
+                            </Box>
+                            <TextFieldYellow
+                                id="otpTextField"
+                                placeholder="Enter OTP"
+                                onChange={(e) =>
+                                    setConfirmationCode(e.target.value)
+                                }
+                            />
+                            {error ? (
+                                <Alert severity="error">{error}</Alert>
+                            ) : (
+                                ""
+                            )}
+                        </Stack>
+                        <BlackButton
+                            onClick={async () => {
+                                await handleSignUpConfirmation();
+                            }}
+                        >
+                            Verify
+                        </BlackButton>
+                    </Paper>
                 </Box>
             ) : (
                 <Box
                     sx={{
-                        backgroundColor: "yellow.secondary",
                         flexDirection: "column",
                     }}
                     height="100vh"
@@ -134,63 +154,61 @@ function Signup() {
                     justifyContent="space-evenly"
                     alignItems="center"
                 >
-                    <InsightTitle />
-                    <Stack
-                        justifyContent="center"
-                        alignItems="center"
-                        spacing={2}
-                    >
-                        <Box width="100%">
-                            <Typography
-                                color="black"
-                                variant="body1"
-                                fontWeight="fontWeightMedium"
-                                align="left"
-                            >
-                                Email
-                            </Typography>
-                        </Box>
-                        <TextFieldYellow
-                            id="usernameField"
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                        {/* <Box width="100%">
-                            <Typography
-                                color="black"
-                                variant="body1"
-                                fontWeight="fontWeightMedium"
-                                align="left"
-                            >
-                                Username
-                            </Typography>
-                        </Box>
-                        <TextFieldYellow
-                            onChange={(e) => setUsername(e.target.value)}
-                        /> */}
-                        <Box width="100%">
-                            <Typography
-                                color="black"
-                                variant="body1"
-                                fontWeight="fontWeightMedium"
-                                align="left"
-                            >
-                                Password
-                            </Typography>
-                        </Box>
-                        <TextFieldYellow
-                            onChange={(e) => setPassword(e.target.value)}
-                            id="passwordField"
-                            type="password"
-                        />
-                        {error ? <Alert severity="error">{error}</Alert> : ""}
-                    </Stack>
-                    <BlackButton
-                        onClick={async () => {
-                            await handleSignUp();
+                    <Paper
+                        sx={{
+                            padding: "2em 5em 2em 5em",
+                            display: "flex",
+                            alignItems: "center",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
                         }}
+                        elevation="6"
                     >
-                        Signup
-                    </BlackButton>
+                        <InsightTitle />
+                        <Stack
+                            justifyContent="center"
+                            alignItems="center"
+                            spacing={2}
+                            sx={{
+                                marginTop: "2em",
+                                marginBottom: "2em",
+                            }}
+                        >
+                            <Typography>
+                                Create a new account with us for a one week free
+                                trial.
+                            </Typography>
+                            <Typography
+                                color="black"
+                                variant="body1"
+                                fontWeight="fontWeightMedium"
+                                align="left"
+                            ></Typography>
+                            <TextFieldYellow
+                                id="usernameField"
+                                placeholder="Email"
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
+                            <TextFieldYellow
+                                onChange={(e) => setPassword(e.target.value)}
+                                id="passwordField"
+                                placeholder="New password"
+                                type="password"
+                            />
+                            {error ? (
+                                <Alert severity="error">{error}</Alert>
+                            ) : (
+                                ""
+                            )}
+                        </Stack>
+                        <BlackButton
+                            onClick={async () => {
+                                await handleSignUp();
+                            }}
+                        >
+                            Signup
+                        </BlackButton>
+                    </Paper>
                 </Box>
             )}
         </ThemeProvider>
