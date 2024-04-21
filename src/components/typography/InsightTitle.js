@@ -6,7 +6,6 @@ import "./insight.css";
 const InsightTitleFontFamily = "Inter Tight";
 
 function InsightTitle(props) {
-    console.log("props", props);
     const should_animate = props.is_animated;
     return (
         <Stack justifyContent="center" alignItems="center">

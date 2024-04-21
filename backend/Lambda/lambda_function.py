@@ -1,4 +1,3 @@
-import json
 import io
 import logging
 import boto3
@@ -80,10 +79,13 @@ def upload_dataframe_to_s3(job_id, aws_id, category, df):
 
     res_name = str(job_id) + ".json"  # should already be string, but just in case
     res_path = gen_file_path(category, aws_id, res_name)
-    logger.info(f"[{job_id}] Uploading results to {res_name}")
+    logger.info(f"[{job_id}] Uploading {category} to {res_name}")
 
     tmpfile = io.StringIO()
-    df.to_json(tmpfile)  # write dataframe to a temp file
+    if category == "results":
+        df.to_json(tmpfile)  # write dataframe to a temp file
+    else:
+        df.to_json(tmpfile, orient="records")  # write as records format
     obj = boto3.resource("s3").Object(DATA_BUCKET, res_path)
     obj.put(Body=tmpfile.getvalue())  # upload temp file to S3
 

@@ -121,31 +121,7 @@ class ReviewProcessor:
         output_df = pd.DataFrame()
         output_df["frequency"] = raw_df.groupby("topic")["frequency"].sum()
         output_df["sentiment"] = raw_df.groupby("topic")["sentiment"].mean()
+        output_df = output_df.reset_index()  # return topic to being a normal column
 
         # return both dfs
         return output_df, raw_df
-
-
-if __name__ == "__main__":
-    os.environ["GOOGLE_API_KEY"] = "AIzaSyB30Fptqtj4kDp9qgEkKWQAiDPinjPtmdM"
-    with open("backend/Lambda/prompt.txt", "r") as f:
-        prompt_template = f.read()
-    processor = ReviewProcessor(
-        "jobid",
-        prompt_template,
-        dict(
-            product_name="Amazon Kindle",
-            review_title_col="reviews.title",
-            review_text_col="reviews.text",
-            review_rating_col="reviews.rating",
-        ),
-    )
-
-    # FOR LOCAL DEBUGGING
-    # for mth in ("feb", "mar", "apr"):
-    #     print("#" * 300)
-    #     print("Working on", mth)
-    #     df = pd.read_csv(f"C:\\Users\\JunYou\\Downloads\\reviews\\{mth}_reviews.csv")
-    #     output_df, raw_df = processor.process_data(df)
-    #     output_df.to_json(f"C:\\Users\\JunYou\\Downloads\\reviews\\{mth}_results.json")
-    #     raw_df.to_csv(f"C:\\Users\\JunYou\\Downloads\\reviews\\{mth}_summary.csv")
